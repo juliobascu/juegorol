@@ -25,6 +25,16 @@ def mostrar_usuarios():
     cursor.close()
     return render_template('usuarios.html', usuarios=usuarios)
 
+@app.route('/personajes')
+def mostrar_personajes():
+    conn = mysql.connection
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM juegorol.personajes")
+    pj = cursor.fetchall()
+    print(pj)
+    cursor.close()
+    return render_template('personajes.html', pj=pj)
+
 mysql = MySQL(app)
 if __name__ == '__main__':
     app.run(debug=True)
