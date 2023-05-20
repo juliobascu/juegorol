@@ -9,6 +9,7 @@
   </head>
   <body>
     <div class="container">
+      {% if nusuarios > 0 %}
       <h1 class="mt-4 mb-4">Lista de usuarios</h1>
       <table class="table table-striped">
         <thead>
@@ -28,6 +29,18 @@
               <td>{{ usuario[3] }}</td>
             </tr>
           {% endfor %}
+        {% else %}
+        <div class="container p-4">
+          <div class="card" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title">No se encontro ningun usuario</h5>
+              <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+              <a href="#" class="card-link">Añadir Usuario</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
         </tbody>
       </table>
     </div>
