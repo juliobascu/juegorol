@@ -1,15 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_mysqldb import MySQL
-
-# Models
-from models.ModelUsuarios import *
-
-# Entities
-from models.entities.Usuario import *
+from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
+from flask_mysqldb import MySQL, MySQLdb
 
 app = Flask(__name__)
-
-app.config['SECRET_KEY'] = 'CRkETIkXn0fAU:'
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -18,30 +10,26 @@ app.config['MYSQL_DB'] = 'juegorol'
 
 mysql = MySQL(app)
 
-@app.route("/", methods = ["GET", "POST"])
+@app.route("/")
 def index():
     return redirect(url_for("login"))
 
 @app.route("/login" , methods = ["GET", "POST"])
 def login():
     if request.method == "POST":
-        usuario = Usuario(0, request.form["nombre"], request.form["contraseña"], request.form["rol"])
-        print(usuario.contraseña)
-        usuarioLogeado = ModelUsuarios.login(mysql, usuario)
-        print(usuarioLogeado.nombre)
-        print(usuarioLogeado.contraseña)
-        if usuarioLogeado != None:
-            if usuarioLogeado.verificarContraseña():
-                return redirect(url_for("paginaUsuario"))
-            else:
-                flash("Contraseña invalida...")
-                return render_template('index.html')
+        nombre = request.form["nombre"]
+        contraseña = request.form["contraseña"]
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM usuarios WHERE Nombre_Usuario = %s AND Contraseña = %s", (nombre, contraseña))
+        usuario = cursor.fetchone()
+        cursor.close()
+        if usuario:
+            return redirect(url_for("paginaUsuario"))
         else:
-            print("Usuario no encontrado..")
-            flash("Usuario no encontrado...")
-            return render_template("index.html")
+            error = 'Nombre de usuario o contraseña incorrectos'
+            return render_template('index.html', error=error)
     else:
-        print("Metodo Invalido")
         return render_template('index.html')
 
 @app.route("/usuario")
@@ -62,11 +50,22 @@ def mostrarUsuarios():
 def mostrarPersonajes():
     conn = mysql.connection
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM juegorol.personajes")
+    cursor.execute("""SELECT `vista_personaje1`.`ID_Personaje`,
+    `vista_personaje1`.`Nombre_Jugador`,
+    `vista_personaje1`.`Nombre_Personaje`,
+    `vista_personaje1`.`Raza`,
+    `vista_personaje1`.`Nivel`,
+    `vista_personaje1`.`Nombre_Estado`,
+    `vista_personaje1`.`Nombre_Habilidad`,
+    `vista_personaje1`.`Nombre_Equipamiento`,
+    `vista_personaje1`.`Nombre_Poder`
+    FROM `juegorol`.`vista_personaje1`;""")
     pj = cursor.fetchall()
     print(pj)
+
     cursor.close()
     return render_template('personajes.html', pj=pj)
 
 if __name__ == '__main__':
+    app.secret_key = "CRkETIkXn0fAU:"
     app.run(debug=True)

@@ -9,7 +9,6 @@
   </head>
   <body>
     <div class="container">
-      {% if npj > 0 %}
       <h1 class="mt-4 mb-4">Lista de personajes </h1>
       <table class="table table-striped">
         <thead>
@@ -18,29 +17,25 @@
             <th scope="col">Nombre</th>
             <th scope="col">Raza</th>
             <th scope="col">Clase</th>
+            <th scope="col">Clase</th>
+            <th scope="col">Clase</th>
+            <th scope="col">Clase</th>
+            <th scope="col">Clase</th>
           </tr>
         </thead>
         <tbody>
           {% for usuario in pj %}
             <tr>
               <td>{{ usuario[0] }}</td>
+              <td>{{ usuario[1] }}</td>
               <td>{{ usuario[2] }}</td>
               <td>{{ usuario[3] }}</td>
               <td>{{ usuario[4] }}</td>
+              <td>{{ usuario[5] }}</td>
+              <td>{{ usuario[6] }}</td>
+              <td>{{ usuario[7] }}</td>
             </tr>
           {% endfor %}
-          {% else %}
-          <div class="container p-4">
-            <div class="card" style="width: 18rem;">
-              <div class="card-body">
-                <h5 class="card-title">No se encontro ningun personaje del usuario </h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#" class="card-link">Añadir Personajes</a>
-              </div>
-            </div>
-          </div>
-          {% endif %}
         </tbody>
       </table>
     </div>
