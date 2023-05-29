@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,27 +7,40 @@
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous"> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 </head>
 <body>
     <form class="login-form" action="/login" method="POST">
       <p class="login-text">
         <span class="fa-stack fa-lg">
-          <img id="logo" src="../static/img/login.jpg">
+          <img id="logo" src="../static/img/login.jpg" alt="Logo">
         </span>
       </p>
+      {% with messages = get_flashed_messages() %}
+
+      {% if messages %}
+    <br/>
+    {% for message in messages %}
+      <div class="alert alert-secondary alert-dismissible" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+      {% endif %}
+      {% endwith %}
       <input type="text" class="login-username" autofocus="true" required="true" placeholder="Nombre de Usuario" name="nombre" />
       <input type="password" class="login-password" required="true" placeholder="Contraseña" name="contraseña" />
 
-      <select name="rol" class="login-role">
-        <option value="jugador">Jugador</option>
-        <option value="GM">GM</option>
-      </select>
+      <!-- <select name="rol" class="login-role mb-3"> -->
+        <!-- <option value="jugador">Jugador</option> -->
+        <!-- <option value="GM">GM</option> -->
+      <!-- </select> -->
 
       <input type="submit" name="Login" value="Iniciar Sesion" class="login-submit" />
-    </form>
+    </span>
     <a href="#" class="login-forgot-pass">ASDF</a>
     <div class="underlay-photo"></div>
     <div class="underlay-black"></div> 
-</body>
-</html> 
+</form>
+</html>

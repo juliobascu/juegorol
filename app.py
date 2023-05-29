@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
+import bcrypt
 from flask_mysqldb import MySQL, MySQLdb
 
 app = Flask(__name__)
@@ -21,20 +22,27 @@ def login():
         contraseña = request.form["contraseña"]
         conn = mysql.connection
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM usuarios WHERE Nombre_Usuario = %s AND Contraseña = %s", (nombre, contraseña))
-        usuario = cursor.fetchone()
-        cursor.close()
-        if usuario:
-            return redirect(url_for("paginaUsuario"))
-        else:
-            error = 'Nombre de usuario o contraseña incorrectos'
-            return render_template('index.html', error=error)
-    else:
-        return render_template('index.html')
+        cursor.execute("SELECT * FROM usuarios WHERE Nombre_Usuario = %s", (nombre,))
+        usuarios = cursor.fetchall()
 
-@app.route("/usuario")
-def paginaUsuario():
-    return render_template("usuario.html")
+        if usuarios:
+            for usuario in usuarios:
+                if usuario[2] == contraseña:
+                    if usuario[3] == 0:
+                        return render_template("usuario.html", NombreU=usuario[1])
+                    else:
+                        return render_template("GM.html", NombreU=usuario[1])             
+                else:
+                    flash("Contraseña incorrecta...")
+                    cursor.close()
+                    return render_template("index.html")
+        else:
+            flash("Usuario no encontrado...")
+            cursor.close()
+            return render_template("index.html")
+        cursor.close()
+    else:
+        return render_template("index.html")
 
 @app.route('/usuarios')
 def mostrarUsuarios():

@@ -71,7 +71,7 @@ input:focus :-ms-input-placeholder {
   margin: 1rem;
   padding: 0.5rem;
   transition: 250ms background ease-in;
-  width: calc(100% - 3rem);
+  width: calc(100% - 2rem);
 }
 .login-username:focus, .login-password:focus {
   background: white;
@@ -80,7 +80,7 @@ input:focus :-ms-input-placeholder {
   transition: 250ms background ease-in;
 }
 
-.login-role {
+/* .login-role {
   background: transparent;
   border: 0 solid;
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
@@ -98,7 +98,7 @@ input:focus :-ms-input-placeholder {
   background-position: right center;
   background-repeat: no-repeat;
   padding-right: 30px; 
-}
+} */
 
 .login-role:focus {
   background: white;
@@ -167,6 +167,19 @@ input:focus :-ms-input-placeholder {
 .underlay-black {
   background: rgba(0, 0, 0, 0.7);
   z-index: -1;
+}
+
+.alert{
+  background-image: url('../img/x.png');
+  background-size: 10%;
+  background-position: 95% center;
+  background-repeat: no-repeat;
+}
+
+.btn{
+  width: 20%;
+  height: 25px;
+  position: absolute;
 }
 
 @-webkit-keyframes hue-rotate {
