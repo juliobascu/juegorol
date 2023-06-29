@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ NombreU }}</title>
     <link rel="shortcut icon" href="../static/img/logo" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/GM.css') }}">
+    
     <script type="text/javascript" src="{{ url_for('static', filename='js/GM.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KuVqVM2GC1XwONlBlbBnvovD/BQh7UM9/52Kn+3wGie63fhf5geuxW+Nzzh8i0La" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/GM.css') }}">
 </head>
 <body>
     <header>
@@ -21,11 +22,11 @@
         </div>
         <div id="botones" class="btn-group botones">
             <a href="#" class="btn btn-light boton">Visualizar Informes</a>
-            <a href="#" class="btn btn-light">Agregar Habilidad</a>
-            <a href="#" class="btn btn-light">Agregar Poder</a>
-            <a href="#" class="btn btn-light">Agregar Equipamiento</a>
-            <a href="#" class="btn btn-light">Agregar Razas</a>
-            <a href="#" class="btn btn-light">Agregar Estados</a>
+            <a href="#" class="btn btn-light boton">Agregar Habilidad</a>
+            <a href="#" class="btn btn-light boton">Agregar Poder</a>
+            <a href="#" class="btn btn-light boton">Agregar Equipamiento</a>
+            <a href="#" class="btn btn-light boton">Agregar Razas</a>
+            <a href="#" class="btn btn-light boton">Agregar Estados</a>
         </div>
     </header>
     <div class="contaier p-4">
@@ -43,40 +44,38 @@
                     </div>
                 </div>
             {% else %}
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Personajes</th>
-                        </tr>
-                    </thead>
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <tbody>
-                                    {% for usuario in usuariosN %}
-                                        {% if usuario[3] == 0 %}
-                                            <tr>
-                                                <td>{{ usuario[1] }}</td>
-                                                <td>
-                                                    {% for personaje in obtenerPersonajes(usuario[0]) %}
-                                                        <div class="card mb-3 tarjeta">
-                                                            <ul class="list-group list-group-flush">
-                                                                <li class="list-group-item item">Nombre: {{ personaje[3]}}</li>
-                                                                <li class="list-group-item item">Raza: {{personaje[4]}}</li>
-                                                                <li class="list-group-item item">Nivel: {{ personaje[5]}}</li>
-                                                            </ul>
-                                                        </div>
-                                                    {% endfor %}
-                                                </td>
-                                            </tr>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                            </div>
-                        </div>
-                    </div>
-                </table>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Personajes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuariosN %}
+                        {% if usuario[3] == 0 %}
+                            <tr>
+                                <td>{{ usuario[1] }}</td>
+                                <td>
+                                    <div class="row">
+                                        {% for personaje in obtenerPersonajes(usuario[0]) %}
+                                            <div class="col-md-6">
+                                                <div class="card mb-3 mt-3 tarjeta">
+                                                    <ul class="list-group list-group-flush">
+                                                        <li class="list-group-item item">Nombre: {{ personaje[3]}}</li>
+                                                        <li class="list-group-item item">Raza: {{personaje[4]}}</li>
+                                                        <li class="list-group-item item">Nivel: {{ personaje[5]}}</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
             {% endif %}
         </main>
     </div>
