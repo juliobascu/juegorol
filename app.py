@@ -31,7 +31,13 @@ def login():
                     if usuario[3] == 0:
                         return render_template("usuario.html", NombreU=usuario[1])
                     else:
-                        return render_template("GM.html", NombreU=usuario[1])             
+                        conn = mysql.connection
+                        cursor = conn.cursor()
+                        cursor.execute("SELECT * FROM juegorol.usuarios")
+                        usuariosN = cursor.fetchall()
+                        nusuarios = len(usuarios)
+                        cursor.close()
+                        return render_template("GM.html", NombreU=usuario[1], usuariosN=usuariosN, nusuarios = nusuarios)             
                 else:
                     flash("Contraseña incorrecta...")
                     cursor.close()
@@ -43,6 +49,18 @@ def login():
         cursor.close()
     else:
         return render_template("index.html")
+
+@app.context_processor
+def utility_processor():
+    def obtenerPersonajes(id_usuario):
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM personajes WHERE ID_Usuario = %s", (id_usuario,))
+        personajes = cursor.fetchall()
+        cursor.close()
+        return personajes
+
+    return dict(obtenerPersonajes=obtenerPersonajes)
 
 @app.route('/usuarios')
 def mostrarUsuarios():
@@ -69,7 +87,6 @@ def mostrarPersonajes():
     `vista_personaje1`.`Nombre_Poder`
     FROM `juegorol`.`vista_personaje1`;""")
     pj = cursor.fetchall()
-    print(pj)
 
     cursor.close()
     return render_template('personajes.html', pj=pj)
