@@ -62,35 +62,6 @@ def utility_processor():
 
     return dict(obtenerPersonajes=obtenerPersonajes)
 
-@app.route('/usuarios')
-def mostrarUsuarios():
-    conn = mysql.connection
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM juegorol.usuarios")
-    usuarios = cursor.fetchall()
-    nusuarios = len(usuarios)
-    cursor.close()
-    return render_template('usuarios.html', usuarios=usuarios, nusuarios=nusuarios)
-
-@app.route('/personajes')
-def mostrarPersonajes():
-    conn = mysql.connection
-    cursor = conn.cursor()
-    cursor.execute("""SELECT `vista_personaje1`.`ID_Personaje`,
-    `vista_personaje1`.`Nombre_Jugador`,
-    `vista_personaje1`.`Nombre_Personaje`,
-    `vista_personaje1`.`Raza`,
-    `vista_personaje1`.`Nivel`,
-    `vista_personaje1`.`Nombre_Estado`,
-    `vista_personaje1`.`Nombre_Habilidad`,
-    `vista_personaje1`.`Nombre_Equipamiento`,
-    `vista_personaje1`.`Nombre_Poder`
-    FROM `juegorol`.`vista_personaje1`;""")
-    pj = cursor.fetchall()
-
-    cursor.close()
-    return render_template('personajes.html', pj=pj)
-
 if __name__ == '__main__':
     app.secret_key = "CRkETIkXn0fAU:"
     app.run(debug=True)
