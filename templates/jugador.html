@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ NombreU }}</title>
+    <link rel="shortcut icon" href="../static/img/logo" type="image/x-icon">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/GM.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KuVqVM2GC1XwONlBlbBnvovD/BQh7UM9/52Kn+3wGie63fhf5geuxW+Nzzh8i0La" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jugador.css') }}">
+</head>
+<body>
+    <header>
+        <div id="nombreGM" class="">
+            <div class="">
+                Bienvenido Jugador: {{ NombreU }}
+            </div>
+        </div>
+        <div id="botones" class="btn-group botones">
+            <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#crearPj">Crear Personaje</a>
+        </div>
+    </header>
+    <div class="contaier p-4">
+        <main>
+            <h3>Personajes</h3>
+            {% if nusuarios == 0 %}
+                <div class="container p-4">
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">No se encontro ningun usuario</h5>
+                            <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                            <a href="#" class="card-link">Añadir Usuario</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Personajes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuariosN %}
+                        {% if usuario[1] == NombreU %}
+                            <tr>
+                                <td>{{ usuario[1] }}</td>
+                                <td>
+                                    <div class="row">
+                                        {% for personaje in obtenerPersonajes(usuario[0]) %}
+                                            <div class="col-md-6">
+                                                <div class="card mb-3 mt-3 tarjeta" >
+                                                    <ul class="list-group list-group-flush">
+                                                        <li class="list-group-item item">Nombre: {{ personaje[3]}}</li>
+                                                        <li class="list-group-item item">Raza: {{personaje[4]}}</li>
+                                                        <li class="list-group-item item">Nivel: {{ personaje[5]}}</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </main>
+    </div>
+    <footer>
+        <div class="footer">
+            <p>&copy; Infinity Creations</p>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="crearPj" tabindex="-1" aria-labelledby="crearPj" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Creación de personaje</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label for="nombre" class="form-label">Nombre Jugador</label>
+                                <input type="text" class="form-control" id="inputNombreJ" name="nombreJ" value="{{ NombreU }}" disabled>
+                            </div>
+                            <div class="col mb-3">
+                                <label for="nombre" class="form-label">Nombre Personaje</label>
+                                <input type="text" class="form-control" id="inputNombreP" name="nombreP" placeholder="">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label for="nivel" class="form-label">Nivel</label>
+                                <input type="text" class="form-control" id="nivel" value="1" disabled >
+                            </div>
+                            <div class="col mb-3">
+                                <label for="nombre" class="form-label">Estado</label>
+                                <input type="text" class="form-control" id="inputNombreP" name="nombreP" value="Vivo" disabled>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="raza" class="form-label">Raza</label>
+                            <select class="form-select" aria-label="Default select example">
+                                <option value="">Seleccionar raza</option>
+                                {% for raza in obtenerRazas() %}
+                                <option value="1">{{raza[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label for="nivel" class="form-label">Habilidad 1</label>
+                                <select id="selectHabilidad1" class="form-select" aria-label="Default select example" onchange="actualizarSelectHabilidades(this.value, 'selectHabilidad2')">
+                                    <option value="">Habilidad 1</option>
+                                    <option value="1">Habilidad 2</option>
+                                    <option value="2">Habilidad 3</option>
+                                    <option value="3">Habilidad 4</option>
+                                    <option value="4">Habilidad 5</option>
+                                </select>
+                            </div>
+                            <div class="col mb-3">
+                                <label for="nombre" class="form-label">Habilidad 2</label>
+                                <select id="selectHabilidad2" class="form-select" aria-label="Default select example" onchange="actualizarSelectHabilidades(this.value, 'selectHabilidad1')">
+                                    <option value="">Habilidad 1</option>
+                                    <option value="1">Habilidad 2</option>
+                                    <option value="2">Habilidad 3</option>
+                                    <option value="3">Habilidad 4</option>
+                                    <option value="4">Habilidad 5</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label for="nivel" class="form-label">Poder</label>
+                                <select id="selectHabilidad1" class="form-select" aria-label="Default select example" onchange="actualizarSelectHabilidades(this.value, 'selectHabilidad2')">
+                                    <option value="">Seleccionar poder</option>
+                                    {% for poder in obtenerPoderes() %}
+                                    <option value="1">{{poder[0]}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col mb-3">
+                                <label for="nombre" class="form-label">Equipamiento</label>
+                                <select id="selectHabilidad2" class="form-select" aria-label="Default select example" onchange="actualizarSelectHabilidades(this.value, 'selectHabilidad1')">
+                                    <option value="">Seleccionar equipamiento</option>
+                                    {% for equipamiento in obtenerEquipamientos() %}
+                                    <option value="1">{{equipamiento[0]}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    <script src="../static/js/jugador.js"></script>
+</body>
+</html>

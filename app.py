@@ -29,7 +29,13 @@ def login():
             for usuario in usuarios:
                 if usuario[2] == contraseña:
                     if usuario[3] == 0:
-                        return render_template("usuario.html", NombreU=usuario[1])
+                        conn = mysql.connection
+                        cursor = conn.cursor()
+                        cursor.execute("SELECT * FROM juegorol.usuarios")
+                        usuariosN = cursor.fetchall()
+                        nusuarios = len(usuarios)
+                        cursor.close()
+                        return render_template("jugador.html", NombreU=usuario[1], usuariosN=usuariosN, nusuarios = nusuarios)
                     else:
                         conn = mysql.connection
                         cursor = conn.cursor()
@@ -61,6 +67,42 @@ def utility_processor():
         return personajes
 
     return dict(obtenerPersonajes=obtenerPersonajes)
+
+@app.context_processor
+def utility_processor():
+    def obtenerRazas():
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT raza FROM poderes GROUP BY raza")
+        razas = cursor.fetchall()
+        cursor.close()
+        return razas
+
+    return dict(obtenerRazas=obtenerRazas)
+
+@app.context_processor
+def utility_processor():
+    def obtenerPoderes():
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT Nombre_Poder FROM poderes")
+        poderes = cursor.fetchall()
+        cursor.close()
+        return poderes
+
+    return dict(obtenerPoderes=obtenerPoderes)
+
+@app.context_processor
+def utility_processor():
+    def obtenerEquipamientos():
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT Nombre_Equipamiento FROM equipamientos")
+        equipamientos = cursor.fetchall()
+        cursor.close()
+        return equipamientos
+
+    return dict(obtenerEquipamientos=obtenerEquipamientos)
 
 if __name__ == '__main__':
     app.secret_key = "CRkETIkXn0fAU:"
