@@ -20,6 +20,7 @@
             </div>
         </div>
         <div id="botones" class="btn-group botones">
+            <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#editorpj"  onclick="obtenerValores()">Editar Personaje</a>
             <a href="#" class="btn btn-light boton">Visualizar Informes</a>
             <a href="#" class="btn btn-light boton">Agregar Habilidad</a>
             <a href="#" class="btn btn-light boton">Agregar Poder</a>
@@ -59,11 +60,12 @@
                                     <div class="row">
                                         {% for personaje in obtenerPersonajes(usuario[0]) %}
                                             <div class="col-md-6">
-                                                <div class="card mb-3 mt-3 tarjeta" data-bs-toggle="modal" data-bs-target="#editorpj">
+                                                <div class="card mb-3 mt-3 tarjeta">
                                                     <ul class="list-group list-group-flush">
-                                                        <li class="list-group-item item">Nombre: {{ personaje[3]}}</li>
-                                                        <li class="list-group-item item">Raza: {{personaje[4]}}</li>
-                                                        <li class="list-group-item item">Nivel: {{ personaje[5]}}</li>
+                                                        <li class="list-group-item item" >Id: {{ personaje[0]}}</li>
+                                                        <li class="list-group-item item" >Nombre: {{ personaje[3]}}</li>
+                                                        <li class="list-group-item item" >Raza: {{personaje[4]}}</li>
+                                                        <li class="list-group-item item" >Nivel: {{ personaje[5]}}</li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -94,17 +96,9 @@
                 <div class="modal-body">
                     <form>
                         <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="nombre">
-                        </div>
-                        <div class="mb-3">
-                            <label for="raza" class="form-label">Raza</label>
-                            <input type="text" class="form-control" id="raza">
-                        </div>
-                        <div class="mb-3">
-                            <label for="nivel" class="form-label">Nivel</label>
-                            <input type="text" class="form-control" id="nivel">
-                        </div>
+                            <label for="nombre" class="form-label">ID:</label>
+                            <input type="text" class="form-control" id="idpj">
+                        </div>        
                     </form>
                 </div>
             </div>
