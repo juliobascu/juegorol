@@ -1,5 +1,54 @@
-function obtenerValores() {
-    var id = document.getElementById("nombrepj");
-    var idtxt = id.textContent;
-    console.log(idtxt);
-};
+function buscarPersonaje() {
+    var id = document.getElementById('idpj').value;
+    var url = '/personaje/' + id;
+
+    $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(response) {
+            mostrarDetallesPersonaje(response);
+            console.log(response)
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+function mostrarDetallesPersonaje(personaje) {
+    var modalBody = document.querySelector('#personajemodal .modal-body');
+    var formularioHTML = "";
+    formularioHTML += '<form>';
+
+    formularioHTML += '<div class="mb-3">';
+    formularioHTML += '<label for="idP">Id Personaje:</label>';
+    formularioHTML += '<input type="text" class="form-control" id="idP" disabled value="' + personaje[0] + '">';
+    formularioHTML += '</div>';
+
+    formularioHTML += '<div class="mb-3">';
+    formularioHTML += '<label for="nombre">Nombre:</label>';
+    formularioHTML += '<input type="text" class="form-control" id="nombre" value="' + personaje[3] + '">';
+    formularioHTML += '</div>';
+
+    formularioHTML += '<div class="mb-3">';
+    formularioHTML += '<label for="raza">Raza:</label>';
+    formularioHTML += '<input type="text" class="form-control" id="raza" value="' + personaje[4] + '">';
+    formularioHTML += '</div>';
+
+    formularioHTML += '<div class="mb-3">';
+    formularioHTML += '<label for="nivel">Nivel:</label>';
+    formularioHTML += '<input type="text" class="form-control" id="nivel" value="' + personaje[5] + '">';
+    formularioHTML += '</div>';
+
+    formularioHTML += '<div class="mb-3">';
+    formularioHTML += '<label for="estado">Estado:</label>';
+    formularioHTML += '<input type="text" class="form-control" id="estado" value="' + personaje[6] + '">';
+    formularioHTML += '</div>';
+
+    formularioHTML += '</form>';
+
+    modalBody.innerHTML = formularioHTML;
+}
+
+
+  

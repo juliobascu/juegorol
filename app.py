@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, Response, session
+from flask import Flask, render_template, request, redirect, url_for, flash, Response, session, jsonify
 import bcrypt
 from flask_mysqldb import MySQL, MySQLdb
 
@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'abc.123'
 app.config['MYSQL_DB'] = 'juegorol'
 
 mysql = MySQL(app)
@@ -104,6 +104,30 @@ def utility_processor():
 
     return dict(obtenerEquipamientos=obtenerEquipamientos)
 
+def obtenerDetallesPersonaje(id_personaje):
+    conn = mysql.connection
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM personajes WHERE ID_Personaje = %s", (id_personaje,))
+    personaje = cursor.fetchone()
+    cursor.close()
+    return personaje
+
+@app.route('/personaje/<int:id>', methods=['GET'])
+def obtener_detalles_personaje(id):
+    personaje = obtenerDetallesPersonaje(id)
+    if personaje:
+        return jsonify(personaje), 200
+    else:
+        return jsonify({'error': 'Personaje no encontrado'}), 404
+
+@app.context_processor
+def utility_processor():
+    return dict(obtenerDetallesPersonaje=obtenerDetallesPersonaje)
+
+
+
 if __name__ == '__main__':
     app.secret_key = "CRkETIkXn0fAU:"
     app.run(debug=True)
+
+    
