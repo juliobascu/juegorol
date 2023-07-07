@@ -79,15 +79,15 @@
         </div>
     </footer>
 
-    <div class="modal fade" id="crearPj" tabindex="-1" aria-labelledby="crearPj" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="crearPj" tabindex="-1" data-bs-backdrop="static" aria-labelledby="crearPj" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Creación de personaje</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="formCrearPersonaje" action="" method="post">
                         <div class="row">
                             <div class="col mb-3">
                                 <label for="nombre" class="form-label">Nombre Jugador</label>
@@ -101,16 +101,16 @@
                         <div class="row">
                             <div class="col mb-3">
                                 <label for="nivel" class="form-label">Nivel</label>
-                                <input type="text" class="form-control" id="nivel" value="1" disabled >
+                                <input type="text" class="form-control" id="nivel" name="nivel" value="1" disabled >
                             </div>
                             <div class="col mb-3">
                                 <label for="nombre" class="form-label">Estado</label>
-                                <input type="text" class="form-control" id="inputNombreP" name="nombreP" value="Vivo" disabled>
+                                <input type="text" class="form-control" id="inputNombreP" name="estado" value="Vivo" disabled>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="raza" class="form-label">Raza</label>
-                            <select id="selectRaza" class="form-select" aria-label="Default select example" onchange="verificarSelectRaza()">
+                            <label for="selectRaza" class="form-label">Raza</label>
+                            <select id="selectRaza" class="form-select" aria-label="Default select example" name="raza" onchange="verificarSelectRaza()">
                                 <option value="">Seleccionar raza</option>
                                 {% for raza in obtenerRazas() %}
                                 <option value={{raza[0]}}>{{raza[0]}}</option>
@@ -121,7 +121,7 @@
                             <div class="row">
                                 <div class="col mb-3">
                                     <label for="nivel" class="form-label">Habilidad 1</label>
-                                    <select id="selectHabilidad1" class="form-select" aria-label="Default select example" onchange="actualizarSelectHabilidades(this.value, 'selectHabilidad2')">
+                                    <select id="selectHabilidad1" class="form-select" aria-label="Default select example" name="habilidad1" onchange="actualizarSelectHabilidades(this.value, 'selectHabilidad2')">
                                         <option value="">Habilidad 1</option>
                                         <option value="1">Habilidad 2</option>
                                         <option value="2">Habilidad 3</option>
@@ -131,7 +131,7 @@
                                 </div>
                                 <div class="col mb-3">
                                     <label for="nombre" class="form-label">Habilidad 2</label>
-                                    <select id="selectHabilidad2" class="form-select" aria-label="Default select example" onchange="actualizarSelectHabilidades(this.value, 'selectHabilidad1')">
+                                    <select id="selectHabilidad2" class="form-select" aria-label="Default select example" name="habilidad2" onchange="actualizarSelectHabilidades(this.value, 'selectHabilidad1')">
                                         <option value="">Habilidad 1</option>
                                         <option value="1">Habilidad 2</option>
                                         <option value="2">Habilidad 3</option>
@@ -143,7 +143,7 @@
                             <div class="row">
                                 <div class="col mb-3">
                                     <label for="nivel" class="form-label">Poder</label>
-                                    <select id="selectPoder" class="form-select" aria-label="Default select example">
+                                    <select id="selectPoder" class="form-select" name="poder" aria-label="Default select example">
                                         <option value="">Seleccionar poder</option>
                                         {% for poder in poderes %}
                                         <option value={{poder[0]}}>{{poder[0]}}</option>
@@ -152,7 +152,7 @@
                                 </div>
                                 <div class="col mb-3">
                                     <label for="nombre" class="form-label">Equipamiento</label>
-                                    <select id="selectEquipamiento" class="form-select" aria-label="Default select example"">
+                                    <select id="selectEquipamiento" class="form-select" name="equipamiento" aria-label="Default select example"">
                                         <option value="">Seleccionar equipamiento</option>
                                         {% for equipamiento in obtenerEquipamientos() %}
                                         <option value={{equipamiento[0]}}>{{equipamiento[0]}}</option>
@@ -161,11 +161,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-success">Crear</button>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>  
                     </form>
                 </div>
             </div>
         </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="../static/js/jugador.js"></script>
+    <script src="../static/js/validacionCrearJugador.js"></script>
 </body>
 </html>

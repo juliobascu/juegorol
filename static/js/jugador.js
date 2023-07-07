@@ -2,6 +2,9 @@ function verificarSelectRaza() {
     var selectRaza = document.getElementById("selectRaza")
     var divHabilidadesYEquip = document.getElementById("habilidadEquipoJugador")
     var selectPoderes = document.getElementById("selectPoder")
+    var selectHabilidad1 = document.getElementById("selectHabilidad1")
+    var selectHabilidad2 = document.getElementById("selectHabilidad2")
+
     if (selectRaza.value != "") {
         divHabilidadesYEquip.hidden = false
         fetch('/actualizarPoderes', {
@@ -25,6 +28,29 @@ function verificarSelectRaza() {
             .catch(function (error) {
                 console.log(error)
             });
+
+        fetch('/actualizarHabilidades', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ raza : selectRaza.value })
+        })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (data) {
+                let selectActualizado = "<option selected value=''>Seleccionar Habilidad</option>"
+                for (let i = 0; i < data.habilidades.length; i++) {
+                    selectActualizado += `<option value=${data.habilidades[i][0]}>${data.habilidades[i][0]}</option>`
+                }
+                console.log(selectActualizado)
+                selectHabilidad1.innerHTML = selectActualizado
+                selectHabilidad2.innerHTML = selectActualizado
+            })
+            .catch(function (error) {
+                console.log(error)
+            });    
     } else {
         divHabilidadesYEquip.hidden = true
     }
