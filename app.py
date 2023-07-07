@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'abc.123'
 app.config['MYSQL_DB'] = 'juegorol'
 
 mysql = MySQL(app)
@@ -112,8 +112,11 @@ def obtenerDetallesPersonaje(id_personaje):
     cursor.execute("SELECT Nombre_Poder FROM poderes p INNER JOIN personaje_poderes pp ON p.ID_Poder = pp.ID_Poder WHERE pp.ID_Personaje = %s", (id_personaje,))
     poderes = cursor.fetchall()
     poderes_list = [p[0] for p in poderes]
+    cursor.execute("SELECT Nombre_Poder FROM poderes")
+    poderesT = cursor.fetchall()
     cursor.close()
     personaje.append(poderes_list)
+    personaje.append(poderesT)
     return personaje
 
 @app.route('/personaje/<int:id>', methods=['GET'])

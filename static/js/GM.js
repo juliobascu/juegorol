@@ -60,7 +60,9 @@ function mostrarDetallesPersonaje(personaje) {
 
         } else {
             formularioHTML += '<select class="form-control" id="select">';
-
+            for (var j = 0; j < poderes.length; j++) {
+                formularioHTML += '<option value="' + poderes[j] + '">' + poderes[j] + '</option>';
+            }
         }
 
         formularioHTML += '</select>';
