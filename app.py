@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'abc.123'
+app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'juegorol'
 
 mysql = MySQL(app)
@@ -80,17 +80,17 @@ def utility_processor():
 
     return dict(obtenerRazas=obtenerRazas)
 
-@app.context_processor
-def utility_processor():
-    def obtenerPoderes():
-        conn = mysql.connection
-        cursor = conn.cursor()
-        cursor.execute("SELECT Nombre_Poder FROM poderes")
-        poderes = cursor.fetchall()
-        cursor.close()
-        return poderes
-
-    return dict(obtenerPoderes=obtenerPoderes)
+@app.route('/actualizarPoderes', methods=['POST'])
+def actualizarPoderes():
+    data = request.get_json()
+    print(data)
+    conn = mysql.connection
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT Nombre_Poder FROM poderes WHERE Raza = '{data['raza']}'")
+    poderes = cursor.fetchall()
+    cursor.close()
+    print(poderes)
+    return {'poderes': poderes}
 
 @app.context_processor
 def utility_processor():
