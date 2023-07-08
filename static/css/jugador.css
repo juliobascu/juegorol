@@ -21,6 +21,11 @@ header::before{
    filter: blur(10px);
 }
   
+label.error {
+    color: red;
+    font-style: italic;
+  }
+
 #nombreGM {
     flex: 1;
     display: flex;

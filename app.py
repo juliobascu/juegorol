@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 #app.config['MYSQL_HOST'] = 'localhost'
 #app.config['MYSQL_USER'] = 'root'
-#app.config['MYSQL_PASSWORD'] = 'abc.123'
+#app.config['MYSQL_PASSWORD'] = "root"
 #app.config['MYSQL_DB'] = 'juegorol'
 
 app.config['MYSQL_HOST'] = 'db4free.net'
@@ -119,6 +119,18 @@ def agregar_habilidad():
         cursor.execute("INSERT INTO habilidades (Nombre_Habilidad, Condicional_Raza) VALUES (%s, %s)", (nombre_habilidad, raza_habilidad))
         mysql.connection.commit()
         return 2
+@app.route('/actualizarHabilidades', methods=['POST'])
+def actualizarHabilidades():
+    data = request.get_json()
+    print(data)
+    conn = mysql.connection
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT Nombre_Habilidad FROM habilidades WHERE Condicional_Raza = '{data['raza']}'")
+    habilidades = cursor.fetchall()
+    cursor.close()
+    print(habilidades)
+    return {'habilidades': habilidades}
+
 @app.context_processor
 def utility_processor():
     def obtenerEquipamientos():
