@@ -4,9 +4,14 @@ from flask_mysqldb import MySQL, MySQLdb
 
 app = Flask(__name__)
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'abc.123'
+#app.config['MYSQL_HOST'] = 'localhost'
+#app.config['MYSQL_USER'] = 'root'
+#app.config['MYSQL_PASSWORD'] = 'abc.123'
+#app.config['MYSQL_DB'] = 'juegorol'
+
+app.config['MYSQL_HOST'] = 'db4free.net'
+app.config['MYSQL_USER'] = 'usuario1234'
+app.config['MYSQL_PASSWORD'] = "usuario1234"
 app.config['MYSQL_DB'] = 'juegorol'
 
 mysql = MySQL(app)
@@ -92,6 +97,28 @@ def actualizarPoderes():
     print(poderes)
     return {'poderes': poderes}
 
+@app.route('/agregar_poder', methods=['POST'])
+def agregar_poder():
+    if request.method == "POST":
+        nombre_poder = request.form['nombrePoder']
+        detalle_poder = request.form['detallePoder']
+        raza_poder = request.form['razaPoder']
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO poderes (Nombre_Poder, Detalle, Raza) VALUES (%s, %s, %s)", (nombre_poder, detalle_poder, raza_poder))
+        mysql.connection.commit()
+        return "Ingresado"
+    
+@app.route('/agregar_habilidad', methods=['POST'])
+def agregar_habilidad():
+    if request.method == "POST":
+        nombre_habilidad = request.form['nombreHabilidad']
+        raza_habilidad = request.form['razaHabilidad']
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO habilidades (Nombre_Habilidad, Condicional_Raza) VALUES (%s, %s)", (nombre_habilidad, raza_habilidad))
+        mysql.connection.commit()
+        return 2
 @app.context_processor
 def utility_processor():
     def obtenerEquipamientos():
@@ -130,6 +157,16 @@ def obtener_detalles_personaje(id):
 @app.context_processor
 def utility_processor():
     return dict(obtenerDetallesPersonaje=obtenerDetallesPersonaje)
+
+@app.route("/informe")
+def generarInforme():
+    conn = mysql.connection
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM informepj")
+    pj = cursor.fetchall()
+    print(pj)
+    cursor.close()
+    return render_template("informe.html", pj=pj)
 
 if __name__ == '__main__':
     app.secret_key = "CRkETIkXn0fAU:"

@@ -21,12 +21,12 @@
         </div>
         <div id="botones" class="btn-group botones">
             <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#editorpj">Editar Personaje</a>
-            <a href="#" class="btn btn-light boton">Visualizar Informes</a>
-            <a href="#" class="btn btn-light boton">Agregar Habilidad</a>
-            <a href="#" class="btn btn-light boton">Agregar Poder</a>
-            <a href="#" class="btn btn-light boton">Agregar Equipamiento</a>
-            <a href="#" class="btn btn-light boton">Agregar Razas</a>
-            <a href="#" class="btn btn-light boton">Agregar Estados</a>
+            <a href="#" class="btn btn-light boton" oncl>Visualizar Informes</a>
+            <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#agregarHabilidad">Agregar Habilidad</a>
+            <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#agregarPoder">Agregar Poder</a>
+            <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#agregarEquipamiento">Agregar Equipamiento</a>
+            <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#agregarRaza">Agregar Razas</a>
+            <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#agregarEstado">Agregar Estados</a>
         </div>
     </header>
     <div class="contaier p-4">
@@ -86,6 +86,7 @@
         </div>
     </footer>
 
+    <!-- MODAL BUSQUEDA PERSONAJE -->
     <div class="modal fade" id="editorpj" tabindex="-1" aria-labelledby="editorpj" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -107,6 +108,7 @@
             </div>
         </div>
     </div>
+    <!-- MODAL DETALLES PERSONAJE -->
     <div class="modal fade" id="personajemodal" tabindex="-1" aria-labelledby="personajemodal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -126,8 +128,118 @@
             </div>
         </div>
     </div>
-    
-
+    <!-- MODAL AGREGAR HABILIDADES -->
+    <div class="modal fade" id="agregarHabilidad" tabindex="-1" aria-labelledby="agregarHabilidad" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarHabilidadLabel">Agregar Habilidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agregarHabilidadForm" method="POST" action="{{ url_for('agregar_habilidad') }}">
+                        <div class="mb-3">
+                            <label for="nombreHabilidad" class="form-label">Nombre de la Habilidad:</label>
+                            <input type="text" class="form-control" id="nombreHabilidad" name="nombreHabilidad" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="razaHabilidad" class="form-label">Raza a la cual pertenece:</label>
+                            <input type="text" class="form-control" id="razaHabilidad" name="razaHabilidad" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Habilidad Al Sistema</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL AGREGAR PODERES -->
+    <div class="modal fade" id="agregarPoder" tabindex="-1" aria-labelledby="agregarPoder" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarPoderModalLabel">Agregar Poder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agregarPoderForm" method="POST" action="{{ url_for('agregar_poder') }}">
+                        <div class="mb-3">
+                            <label for="nombrePoder" class="form-label">Nombre del poder:</label>
+                            <input type="text" class="form-control" id="nombrePoder" name="nombrePoder" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="detallePoder" class="form-label">Detalle del poder:</label>
+                            <textarea class="form-control" id="detallePoder" name="detallePoder" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="razaPoder" class="form-label">Raza a la cual pertenece:</label>
+                            <input type="text" class="form-control" id="razaPoder" name="razaPoder" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Poder Al Sistema</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL AGREGAR EQUIPAMIENTOS -->
+    <div class="modal fade" id="agregarEquipamiento" tabindex="-1" aria-labelledby="agregarEquipamiento" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarEquipamientoLabel">Agregar Equipamiento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agregarEquipamientoForm" method="POST" action="">
+                        <div class="mb-3">
+                            <label for="nombreEquipamiento" class="form-label">Nombre del Equipamiento:</label>
+                            <input type="text" class="form-control" id="nombreEquipamiento" name="nombreEquipamiento" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Equipamiento Al Sistema</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL AGREGAR RAZAS -->
+    <div class="modal fade" id="agregarRaza" tabindex="-1" aria-labelledby="agregarRaza" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarRazaLabel">Agregar Raza</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agregarRazaForm" method="POST" action="">
+                        <div class="mb-3">
+                            <label for="nombreRaza" class="form-label">Nombre de la Raza:</label>
+                            <input type="text" class="form-control" id="nombreRaza" name="nombreRaza" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Raza Al Sistema</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL AGREGAR ESTADOS -->
+    <div class="modal fade" id="agregarEstado" tabindex="-1" aria-labelledby="agregarEstado" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarEstadoLabel">Agregar Estado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agregarEstadoForm" method="POST" action="">
+                        <div class="mb-3">
+                            <label for="nombreEstado" class="form-label">Nombre del Estado:</label>
+                            <input type="text" class="form-control" id="nombreEstado" name="nombreEstado" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Estado Al Sistema</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
       
 </body>
 </html>
