@@ -4,15 +4,15 @@ from flask_mysqldb import MySQL, MySQLdb
 
 app = Flask(__name__)
 
-#app.config['MYSQL_HOST'] = 'localhost'
-#app.config['MYSQL_USER'] = 'root'
-#app.config['MYSQL_PASSWORD'] = "root"
-#app.config['MYSQL_DB'] = 'juegorol'
-
-app.config['MYSQL_HOST'] = 'db4free.net'
-app.config['MYSQL_USER'] = 'usuario1234'
-app.config['MYSQL_PASSWORD'] = "usuario1234"
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = "abc.123"
 app.config['MYSQL_DB'] = 'juegorol'
+
+#app.config['MYSQL_HOST'] = 'db4free.net'
+#app.config['MYSQL_USER'] = 'usuario1234'
+#app.config['MYSQL_PASSWORD'] = "usuario1234"
+#app.config['MYSQL_DB'] = 'juegorol'
 
 mysql = MySQL(app)
 
@@ -42,13 +42,11 @@ def login():
                         cursor.close()
                         return render_template("jugador.html", NombreU=usuario[1], usuariosN=usuariosN, nusuarios = nusuarios)
                     else:
-                        conn = mysql.connection
-                        cursor = conn.cursor()
-                        cursor.execute("SELECT * FROM juegorol.usuarios")
-                        usuariosN = cursor.fetchall()
                         nusuarios = len(usuarios)
-                        cursor.close()
-                        return render_template("GM.html", NombreU=usuario[1], usuariosN=usuariosN, nusuarios = nusuarios)             
+                        session["GM_logeado"] = True
+                        session["nombre_usuario"] = usuario[1]
+                        session["usuariosTotales"] = nusuarios
+                        return redirect(url_for("paginaGM"))
                 else:
                     flash("Contraseña incorrecta...")
                     cursor.close()
@@ -60,6 +58,51 @@ def login():
         cursor.close()
     else:
         return render_template("index.html")
+    
+@app.route("/logOut")
+def logOut():
+    session.pop("GM_logeado", None)
+    return redirect(url_for("index"))
+
+@app.route("/paginaGM")
+def paginaGM():
+    if session.get("GM_logeado"):
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM juegorol.usuarios")
+        usuariosN = cursor.fetchall()
+        cursor.close()
+        return render_template("GM.html", usuariosN=usuariosN, NombreU=session["nombre_usuario"], nusuarios=session["usuariosTotales"])         
+    else:
+        return redirect(url_for("login"))    
+
+@app.route('/buscar_personaje', methods=['POST'])
+def buscar_personaje():
+    id_personaje = request.form['idpj']
+    conn = mysql.connection
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM personajes WHERE ID_Personaje = %s", (id_personaje,))
+    personaje = cursor.fetchone()
+    print(personaje)
+    cursor.execute("SELECT Nombre_Habilidad FROM habilidades a INNER JOIN personaje_habilidades aa ON a.ID_Habilidad = aa.ID_Habilidad WHERE aa.ID_Personaje = %s", (id_personaje,))
+    habilidades = cursor.fetchall()
+    print(habilidades)
+    cursor.execute("SELECT Nombre_Poder FROM poderes p INNER JOIN personaje_poderes pp ON p.ID_Poder = pp.ID_Poder WHERE pp.ID_Personaje = %s", (id_personaje,))
+    poderes = cursor.fetchall()
+    print(poderes)
+    cursor.execute("SELECT Nombre_Poder FROM poderes WHERE Raza = %s", (personaje[4],))
+    poderesRaza = cursor.fetchall()
+    print(poderesRaza)
+    cursor.execute("SELECT Nombre_Equipamiento, Cantidad FROM equipamientos e INNER JOIN personaje_equipamientos ee ON e.ID_Equipamiento = ee.ID_Equipamiento WHERE ee.ID_Personaje = %s", (id_personaje,))
+    equipamientos = cursor.fetchall()
+    print(equipamientos)
+    cursor.execute("SELECT * FROM razas")
+    razas = cursor.fetchall()
+    print(razas)
+    cursor.close()
+
+    return render_template("editorPj.html", personaje=personaje, habilidades=habilidades, poderes=poderes, poderesRaza=poderesRaza, equipamientos=equipamientos, razas=razas)
+
 
 @app.context_processor
 def utility_processor():
@@ -107,7 +150,7 @@ def agregar_poder():
         cursor = conn.cursor()
         cursor.execute("INSERT INTO poderes (Nombre_Poder, Detalle, Raza) VALUES (%s, %s, %s)", (nombre_poder, detalle_poder, raza_poder))
         mysql.connection.commit()
-        return "Ingresado"
+        return redirect(url_for("paginaGM"))
     
 @app.route('/agregar_habilidad', methods=['POST'])
 def agregar_habilidad():
@@ -118,7 +161,39 @@ def agregar_habilidad():
         cursor = conn.cursor()
         cursor.execute("INSERT INTO habilidades (Nombre_Habilidad, Condicional_Raza) VALUES (%s, %s)", (nombre_habilidad, raza_habilidad))
         mysql.connection.commit()
-        return 2
+        return redirect(url_for("paginaGM"))
+
+@app.route('/agregar_raza', methods=['POST'])
+def agregar_raza():
+    if request.method == "POST":
+        nombre_raza = request.form['nombreRaza']
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO poderes (Raza) VALUES (%s)", (nombre_raza,))
+        mysql.connection.commit()
+        return redirect(url_for("paginaGM"))
+
+@app.route('/agregar_equipamiento', methods=['POST'])
+def agregar_equipamiento():
+    if request.method == "POST":
+        nombre_equipamiento = request.form['nombreEquipamiento']
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO equipamientos (Nombre_Equipamiento) VALUES (%s)", (nombre_equipamiento,))
+        mysql.connection.commit()
+        return redirect(url_for("paginaGM"))
+    
+@app.route('/agregar_estado', methods=['POST'])
+def agregar_estado():
+    if request.method == "POST":
+        nombre_estado = request.form['nombreEstado']
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO estados (Nombre_Estado) VALUES (%s)", (nombre_estado,))
+        mysql.connection.commit()
+        return redirect(url_for("paginaGM"))
+    
+    
 @app.route('/actualizarHabilidades', methods=['POST'])
 def actualizarHabilidades():
     data = request.get_json()

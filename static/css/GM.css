@@ -4,6 +4,9 @@
     font-family: "Open Sans";
     font-weight: 400;
 }
+body{
+    min-height: 90vh;
+}
 header {
     display: flex;
     justify-content: space-between;

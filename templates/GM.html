@@ -17,11 +17,12 @@
         <div id="nombreGM" class="">
             <div class="">
                 GM: {{ NombreU }}
+                <a href="{{url_for('logOut')}}" class="btn btn-light boton">Cerrar Sesion</a>
             </div>
         </div>
         <div id="botones" class="btn-group botones">
             <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#editorpj">Editar Personaje</a>
-            <a href="#" class="btn btn-light boton" oncl>Visualizar Informes</a>
+            <a href="{{url_for('generarInforme')}}" class="btn btn-light boton" >Visualizar Informes</a>
             <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#agregarHabilidad">Agregar Habilidad</a>
             <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#agregarPoder">Agregar Poder</a>
             <a href="#" class="btn btn-light boton" data-bs-toggle="modal" data-bs-target="#agregarEquipamiento">Agregar Equipamiento</a>
@@ -92,38 +93,15 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Ingrese el Id del Personaje que quiere editar</h5>
-                    
                 </div>
                 <div class="modal-body">
-                    <form onsubmit="buscarPersonaje(); return false;">
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">ID:</label>
-                            <input type="search" class="form-control mb-3" id="idpj">
-                        </div>        
+                    <form method="POST" action="{{ url_for('buscar_personaje') }}">
+                        <div class="mb-3 col-12">
+                            <label class="form-label">ID:</label>
+                            <input type="search" class="form-control" id="idpj" name="idpj">
+                        </div>
+                        <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#personajemodal">Buscar Personaje</button>
                     </form>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#personajemodal" onclick="buscarPersonaje()">Buscar Personaje</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- MODAL DETALLES PERSONAJE -->
-    <div class="modal fade" id="personajemodal" tabindex="-1" aria-labelledby="personajemodal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detalles del Personaje</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        
-                    </form>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-success">Actualizar Usuario</button>
-                    <button type="button" class="btn btn-danger" onclick="eliminarPersonaje()">Eliminar Usuario</button>
                 </div>
             </div>
         </div>
@@ -189,7 +167,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="agregarEquipamientoForm" method="POST" action="">
+                    <form id="agregarEquipamientoForm" method="POST" action="{{url_for('agregar_equipamiento')}}">
                         <div class="mb-3">
                             <label for="nombreEquipamiento" class="form-label">Nombre del Equipamiento:</label>
                             <input type="text" class="form-control" id="nombreEquipamiento" name="nombreEquipamiento" required>
@@ -209,7 +187,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="agregarRazaForm" method="POST" action="">
+                    <form id="agregarRazaForm" method="POST" action="{{url_for('agregar_raza')}}">
                         <div class="mb-3">
                             <label for="nombreRaza" class="form-label">Nombre de la Raza:</label>
                             <input type="text" class="form-control" id="nombreRaza" name="nombreRaza" required>
@@ -229,7 +207,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="agregarEstadoForm" method="POST" action="">
+                    <form id="agregarEstadoForm" method="POST" action="{{url_for('agregar_estado')}}">
                         <div class="mb-3">
                             <label for="nombreEstado" class="form-label">Nombre del Estado:</label>
                             <input type="text" class="form-control" id="nombreEstado" name="nombreEstado" required>
