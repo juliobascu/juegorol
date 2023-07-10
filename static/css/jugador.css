@@ -26,6 +26,10 @@ label.error {
     font-style: italic;
   }
 
+#divPrincipal {
+    min-height: 750px;
+}
+
 #nombreGM {
     flex: 1;
     display: flex;
