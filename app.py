@@ -4,15 +4,15 @@ from flask_mysqldb import MySQL, MySQLdb
 
 app = Flask(__name__)
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = "abc.123"
-app.config['MYSQL_DB'] = 'juegorol'
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = "abc.123"
+# app.config['MYSQL_DB'] = 'juegorol'
 
-#app.config['MYSQL_HOST'] = 'db4free.net'
-#app.config['MYSQL_USER'] = 'usuario1234'
-#app.config['MYSQL_PASSWORD'] = "usuario1234"
-#app.config['MYSQL_DB'] = 'juegorol'
+app.config['MYSQL_HOST'] = 'db4free.net'
+app.config['MYSQL_USER'] = 'usuario1234'
+app.config['MYSQL_PASSWORD'] = "usuario1234"
+app.config['MYSQL_DB'] = 'juegorol'
 
 mysql = MySQL(app)
 
@@ -40,7 +40,10 @@ def login():
                         usuariosN = cursor.fetchall()
                         nusuarios = len(usuarios)
                         cursor.close()
-                        return render_template("jugador.html", NombreU=usuario[1], usuariosN=usuariosN, nusuarios = nusuarios)
+                        session["jugador_logeado"] = True
+                        session["nombre_usuario"] = usuario[1]
+                        session["IDU"] = usuario[0]
+                        return render_template("jugador.html", IDU = usuario[0], NombreU=usuario[1], usuariosN=usuariosN, nusuarios = nusuarios)
                     else:
                         nusuarios = len(usuarios)
                         session["GM_logeado"] = True
@@ -134,7 +137,7 @@ def actualizarPoderes():
     print(data)
     conn = mysql.connection
     cursor = conn.cursor()
-    cursor.execute(f"SELECT Nombre_Poder FROM poderes WHERE Raza = '{data['raza']}'")
+    cursor.execute(f"SELECT ID_Poder, Nombre_Poder FROM poderes WHERE Raza = '{data['raza']}'")
     poderes = cursor.fetchall()
     cursor.close()
     print(poderes)
@@ -200,7 +203,7 @@ def actualizarHabilidades():
     print(data)
     conn = mysql.connection
     cursor = conn.cursor()
-    cursor.execute(f"SELECT Nombre_Habilidad FROM habilidades WHERE Condicional_Raza = '{data['raza']}'")
+    cursor.execute(f"SELECT ID_Habilidad, Nombre_Habilidad FROM habilidades WHERE Condicional_Raza = '{data['raza']}'")
     habilidades = cursor.fetchall()
     cursor.close()
     print(habilidades)
@@ -211,7 +214,7 @@ def utility_processor():
     def obtenerEquipamientos():
         conn = mysql.connection
         cursor = conn.cursor()
-        cursor.execute("SELECT Nombre_Equipamiento FROM equipamientos")
+        cursor.execute("SELECT iD_Equipamiento, Nombre_Equipamiento FROM equipamientos")
         equipamientos = cursor.fetchall()
         cursor.close()
         return equipamientos
@@ -254,6 +257,57 @@ def generarInforme():
     print(pj)
     cursor.close()
     return render_template("informe.html", pj=pj)
+
+@app.route('/crearPersonaje', methods=['POST'])
+def crearPersonaje():
+    if request.method == "POST":
+        print(request.form)
+        idUsuario = request.form["idUsuario"]
+        nombreJugador = request.form["nombreJ"]
+        nombrePersonaje = request.form['nombreP']
+        nivel = request.form['nivel']
+        estado = request.form['estado']
+        raza = request.form['raza']
+        habilidad1 = request.form['habilidad1']
+        habilidad2 = request.form['habilidad2']
+        poder = request.form['poder']
+        equipamiento = request.form['equipamiento']
+        conn = mysql.connection
+        cursor = conn.cursor()
+        # cursor.execute(f"""
+        #     INSERT INTO personajes (ID_Usuario, Nombre_Jugador, Nombre_Personaje, Raza, Nivel, Estado) VALUES ('{idUsuario}', '{nombreJugador}', '{nombrePersonaje}', '{raza}', '{nivel}', '{estado}');
+        #     SET @idPersonaje = LAST_INSERT_ID();
+        #     SELECT ID_Habilidad INTO @idHabilidad1 FROM habilidades where Nombre_Habilidad = '{habilidad1}' limit 1;
+        #     SELECT ID_Habilidad INTO @idHabilidad2 FROM habilidades where Nombre_Habilidad = '{habilidad2}' limit 1;
+        #     SELECT ID_Poder INTO @idPoder FROM poderes where Nombre_Poder = '{poder}' limit 1; 
+        #     SELECT ID_Equipamiento INTO @idEquipamiento FROM equipamientos where Nombre_Equipamiento = '{equipamiento}' limit 1;
+        #     INSERT INTO personaje_habilidades values (@idPersonaje, @idHabilidad1), (@idPersonaje, @idHabilidad2); 
+        #     INSERT INTO personaje_poderes values (@idPersonaje, @idPoder);
+        #     INSERT INTO personaje_equipamientos values (@idPersonaje, @idEquipamiento, 1); 
+        #     """)
+        cursor.execute(f"""
+            INSERT INTO personajes (ID_Usuario, Nombre_Jugador, Nombre_Personaje, Raza, Nivel, Estado) VALUES ('{idUsuario}', '{nombreJugador}', '{nombrePersonaje}', '{raza}', '{nivel}', '{estado}');
+            SET @idPersonaje = LAST_INSERT_ID();
+            SELECT ID_Equipamiento INTO @idEquipamiento FROM equipamientos where Nombre_Equipamiento = '{equipamiento}' limit 1;
+            INSERT INTO personaje_habilidades values (@idPersonaje, {habilidad1}), (@idPersonaje, {habilidad2}); 
+            INSERT INTO personaje_poderes values (@idPersonaje, {poder});
+            INSERT INTO personaje_equipamientos values (@idPersonaje, {equipamiento}, 1); 
+            """)
+        cursor.close()
+        mysql.connection.commit()
+        return redirect(url_for("paginaJugador"))
+
+@app.route("/paginaJugador")
+def paginaJugador():
+    if session.get("jugador_logeado"):
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM juegorol.usuarios")
+        usuariosN = cursor.fetchall()
+        cursor.close()
+        return render_template("jugador.html", usuariosN=usuariosN, NombreU=session["nombre_usuario"], IDU=session["IDU"], nusuarios=session["usuariosTotales"])         
+    else:
+        return redirect(url_for("login"))
 
 if __name__ == '__main__':
     app.secret_key = "CRkETIkXn0fAU:"

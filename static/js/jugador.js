@@ -20,7 +20,8 @@ function verificarSelectRaza() {
             .then(function (data) {
                 let selectActualizado = "<option selected value=''>Seleccionar poder</option>"
                 for (let i = 0; i < data.poderes.length; i++) {
-                    selectActualizado += `<option value=${data.poderes[i][0]}>${data.poderes[i][0]}</option>`
+                    console.log(data.poderes[i][1])
+                    selectActualizado += `<option value=${data.poderes[i][0]}>${data.poderes[i][1]}</option>`
                 }
                 console.log(selectActualizado)
                 selectPoderes.innerHTML = selectActualizado
@@ -42,7 +43,7 @@ function verificarSelectRaza() {
             .then(function (data) {
                 let selectActualizado = "<option selected value=''>Seleccionar Habilidad</option>"
                 for (let i = 0; i < data.habilidades.length; i++) {
-                    selectActualizado += `<option value=${data.habilidades[i][0]}>${data.habilidades[i][0]}</option>`
+                    selectActualizado += `<option value=${data.habilidades[i][0]}>${data.habilidades[i][1]}</option>`
                 }
                 console.log(selectActualizado)
                 selectHabilidad1.innerHTML = selectActualizado
