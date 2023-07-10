@@ -307,9 +307,9 @@
                                 <label for="equipamiento1" class="form-label">Equipamiento 1:</label>
                                 <div class="input-group">
                                     <select class="form-select" id="equipamiento1" name="equipamiento1" disabled>
-                                        <option value="{{ equipamientos[0][0] }}" selected>{{ equipamientos[0][0] }}</option>
+                                        <option value="{{ equipamientos[0][0] }}" selected>{{ equipamientos[0][1] }}</option>
                                     </select>
-                                    <input type="number" class="form-control" id="cantidad1" name="cantidad1" value="{{ equipamientos[0][1] }}" disabled>
+                                    <input type="number" class="form-control" id="cantidad1" name="cantidad1" value="{{ equipamientos[0][2] }}" onlyread>
                                 </div>
                             </div>
                             {% for i in range(2, 9) %}
@@ -320,20 +320,19 @@
                                             {% if equipamientos|length < i %}
                                                 <option value="" selected></option>
                                             {% else %}
-                                                <option value="{{equipamientos[i-1][0]}}">{{ equipamientos[i-1][0] }}</option>
+                                                <option value="{{equipamientos[i-1][0]}}">{{ equipamientos[i-1][1] }}</option>
                                             {% endif %}
                                             {% for equipamiento in equipamientosTotal %}
-                                                <option value="{{ equipamiento[0] }}">{{ equipamiento[0] }}</option>
+                                                <option value="{{ equipamiento[0] }}">{{ equipamiento[1] }}</option>
                                             {% endfor %}
                                         </select>
-                                        <input type="number" class="form-control" id="cantidad{{ i }}" name="cantidad{{ i }}" value="{% if equipamientos|length >= i %}{{ equipamientos[i-1][1] }}{% endif %}">
+                                        <input type="number" class="form-control" id="cantidad{{ i }}" name="cantidad{{ i }}" value="{% if equipamientos|length >= i and equipamientos[i-1]|length >= 3 %}{{ equipamientos[i-1][2] }}{% endif %}">
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
                         
                         <button type="submit" class="btn btn-success">Guardar cambios</button>
-                        <button type="submit" class="btn btn-danger">Eliminar Personaje</button>
                         <button type="reset" class="btn btn-secondary">Reiniciar</button>
                     </form>
                 </div>   

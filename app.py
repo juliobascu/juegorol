@@ -5,15 +5,15 @@ import ast
 
 app = Flask(__name__)
 
-# app.config['MYSQL_HOST'] = 'localhost'
-# app.config['MYSQL_USER'] = 'root'
-# app.config['MYSQL_PASSWORD'] = "abc.123"
-# app.config['MYSQL_DB'] = 'juegorol'
-
-app.config['MYSQL_HOST'] = 'db4free.net'
-app.config['MYSQL_USER'] = 'usuario1234'
-app.config['MYSQL_PASSWORD'] = "usuario1234"
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = "abc.123"
 app.config['MYSQL_DB'] = 'juegorol'
+
+#app.config['MYSQL_HOST'] = 'db4free.net'
+#app.config['MYSQL_USER'] = 'usuario1234'
+#app.config['MYSQL_PASSWORD'] = "usuario1234"
+#app.config['MYSQL_DB'] = 'juegorol'
 
 mysql = MySQL(app)
 
@@ -102,9 +102,9 @@ def buscar_personaje():
         poderes = cursor.fetchall()
         cursor.execute("SELECT Id_Poder, Nombre_Poder FROM poderes WHERE Raza = %s", (personaje[4],))
         poderesRaza = cursor.fetchall()
-        cursor.execute("SELECT Nombre_Equipamiento, Cantidad FROM equipamientos e INNER JOIN personaje_equipamientos ee ON e.ID_Equipamiento = ee.ID_Equipamiento WHERE ee.ID_Personaje = %s", (id_personaje,))
+        cursor.execute("SELECT e.ID_Equipamiento, e.Nombre_Equipamiento, ee.Cantidad FROM equipamientos e INNER JOIN personaje_equipamientos ee ON e.ID_Equipamiento = ee.ID_Equipamiento WHERE ee.ID_Personaje = %s", (id_personaje,))
         equipamientos = cursor.fetchall()
-        cursor.execute("SELECT Nombre_Equipamiento FROM equipamientos")
+        cursor.execute("SELECT Id_Equipamiento, Nombre_Equipamiento FROM equipamientos")
         equipamientosTotal = cursor.fetchall()
         cursor.execute("SELECT * FROM razas")
         razas = cursor.fetchall()
@@ -170,28 +170,40 @@ def actualizarPersonaje():
             params_eliminar = (id_personaje,) + tuple(poderes_a_eliminar)
             cursor.execute(query_eliminar, params_eliminar)
             conn.commit()
-
         for id_poder in poderes_a_insertar:
             cursor.execute("INSERT INTO personaje_poderes (ID_Personaje, ID_Poder) VALUES (%s, %s)",
                 (id_personaje, id_poder))
             conn.commit()
-        #EQUIPAMIENTOS
-        
+    #EQUIPAMIENTOS
+        equipamientos = []
+        cantidades = []
+        cantidad1 = request.form.get("cantidad1")
+        cantidades.append(int(cantidad1))
+        for i in range(2, 9):
+            equipamiento = request.form.get("equipamiento" + str(i))
+            cantidad = request.form.get("cantidad" + str(i))
 
-        equipamiento2 = request.form["equipamiento2"]
-        equipamiento3 = request.form["equipamiento3"]
-        equipamiento4 = request.form["equipamiento4"]
-        equipamiento5 = request.form["equipamiento5"]
-        equipamiento6 = request.form["equipamiento6"]
-        equipamiento7 = request.form["equipamiento7"]
-        equipamiento8 = request.form["equipamiento8"]
-        cantidad2 = request.form["cantidad2"]
-        cantidad3 = request.form["cantidad3"]
-        cantidad4 = request.form["cantidad4"]
-        cantidad5 = request.form["cantidad5"]
-        cantidad6 = request.form["cantidad6"]
-        cantidad7 = request.form["cantidad7"]
-        cantidad8 = request.form["cantidad8"]
+            if equipamiento and cantidad:
+                equipamientos.append(int(equipamiento))
+                cantidades.append(int(cantidad))
+
+        cursor.execute("SELECT ID_Equipamiento FROM personaje_equipamientos WHERE ID_Personaje = %s", (id_personaje,))
+        equipamientos_existentes = cursor.fetchall()
+        equipamientos_existentes = [equipamiento[0] for equipamiento in equipamientos_existentes]
+
+        equipamientos_a_eliminar = list(set(equipamientos_existentes) | set(equipamientos))
+        equipamientos_a_insertar = list(set(equipamientos_existentes) | set(equipamientos))
+
+        if len(equipamientos_a_eliminar) > 0:
+            placeholders = ', '.join(['%s'] * len(equipamientos_a_eliminar))
+            query_eliminar = f"DELETE FROM personaje_equipamientos WHERE ID_Personaje = %s AND ID_Equipamiento IN ({placeholders})"
+            params_eliminar = (id_personaje,) + tuple(equipamientos_a_eliminar)
+            cursor.execute(query_eliminar, params_eliminar)
+            conn.commit()
+
+        for equipamiento, cantidad in zip(equipamientos_a_insertar, cantidades):
+            cursor.execute("INSERT INTO personaje_equipamientos (ID_Personaje, ID_Equipamiento, cantidad) VALUES (%s, %s, %s)",(id_personaje, equipamiento, cantidad))
+            conn.commit()
         cursor.close()
         return redirect(url_for("paginaGM"))
     else:
