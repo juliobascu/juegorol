@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Response, session, jsonify
 import bcrypt
 from flask_mysqldb import MySQL, MySQLdb
+import ast
 
 app = Flask(__name__)
 
@@ -71,38 +72,139 @@ def paginaGM():
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM juegorol.usuarios")
         usuariosN = cursor.fetchall()
+        cursor.execute("SELECT * FROM razas")
+        razas = cursor.fetchall()
         cursor.close()
-        return render_template("GM.html", usuariosN=usuariosN, NombreU=session["nombre_usuario"], nusuarios=session["usuariosTotales"])         
+        return render_template("GM.html", usuariosN=usuariosN, NombreU=session["nombre_usuario"], nusuarios=session["usuariosTotales"], razas=razas)         
     else:
         return redirect(url_for("login"))    
 
 @app.route('/buscar_personaje', methods=['POST'])
 def buscar_personaje():
     id_personaje = request.form['idpj']
-    conn = mysql.connection
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM personajes WHERE ID_Personaje = %s", (id_personaje,))
-    personaje = cursor.fetchone()
-    print(personaje)
-    cursor.execute("SELECT Nombre_Habilidad FROM habilidades a INNER JOIN personaje_habilidades aa ON a.ID_Habilidad = aa.ID_Habilidad WHERE aa.ID_Personaje = %s", (id_personaje,))
-    habilidades = cursor.fetchall()
-    print(habilidades)
-    cursor.execute("SELECT Nombre_Poder FROM poderes p INNER JOIN personaje_poderes pp ON p.ID_Poder = pp.ID_Poder WHERE pp.ID_Personaje = %s", (id_personaje,))
-    poderes = cursor.fetchall()
-    print(poderes)
-    cursor.execute("SELECT Nombre_Poder FROM poderes WHERE Raza = %s", (personaje[4],))
-    poderesRaza = cursor.fetchall()
-    print(poderesRaza)
-    cursor.execute("SELECT Nombre_Equipamiento, Cantidad FROM equipamientos e INNER JOIN personaje_equipamientos ee ON e.ID_Equipamiento = ee.ID_Equipamiento WHERE ee.ID_Personaje = %s", (id_personaje,))
-    equipamientos = cursor.fetchall()
-    print(equipamientos)
-    cursor.execute("SELECT * FROM razas")
-    razas = cursor.fetchall()
-    print(razas)
-    cursor.close()
+    if id_personaje is None:
+        redirect(url_for("paginaGM"))
+    else:
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM personajes WHERE ID_Personaje = %s", (id_personaje,))
+        personaje = cursor.fetchone()
+        if personaje is None:
+            return redirect(url_for("paginaGM"))
+        cursor.execute("SELECT a.ID_Habilidad, a.Nombre_Habilidad FROM habilidades a INNER JOIN personaje_habilidades aa ON a.ID_Habilidad = aa.ID_Habilidad WHERE aa.ID_Personaje = %s", (id_personaje,))
+        habilidades = cursor.fetchall()
+        cursor.execute(f"SELECT Id_Habilidad, Nombre_Habilidad FROM habilidades WHERE Condicional_Raza = '{personaje[4]}'")
+        habilidadesRaza = cursor.fetchall()
+        cursor.execute("SELECT p.ID_Poder, p.Nombre_Poder FROM poderes p INNER JOIN personaje_poderes pp ON p.ID_Poder = pp.ID_Poder WHERE pp.ID_Personaje = %s", (id_personaje,))
+        poderes = cursor.fetchall()
+        cursor.execute("SELECT Id_Poder, Nombre_Poder FROM poderes WHERE Raza = %s", (personaje[4],))
+        poderesRaza = cursor.fetchall()
+        cursor.execute("SELECT Nombre_Equipamiento, Cantidad FROM equipamientos e INNER JOIN personaje_equipamientos ee ON e.ID_Equipamiento = ee.ID_Equipamiento WHERE ee.ID_Personaje = %s", (id_personaje,))
+        equipamientos = cursor.fetchall()
+        cursor.execute("SELECT Nombre_Equipamiento FROM equipamientos")
+        equipamientosTotal = cursor.fetchall()
+        cursor.execute("SELECT * FROM razas")
+        razas = cursor.fetchall()
+        cursor.execute("SELECT e.Nombre_Estado FROM estados e INNER JOIN personajes p ON e.Nombre_Estado = p.Estado WHERE p.ID_Personaje = %s", (id_personaje,))
+        estados = cursor.fetchall()
+        cursor.execute("SELECT Nombre_Estado FROM estados")
+        estadosTotal = cursor.fetchall()
+        cursor.close()
+        return render_template("editorPj.html", personaje=personaje, habilidades=habilidades, habilidadesRaza=habilidadesRaza, poderes=poderes, poderesRaza=poderesRaza, equipamientos=equipamientos, equipamientosTotal=equipamientosTotal, razas=razas, estados=estados, estadosTotal=estadosTotal)
 
-    return render_template("editorPj.html", personaje=personaje, habilidades=habilidades, poderes=poderes, poderesRaza=poderesRaza, equipamientos=equipamientos, razas=razas)
+@app.route("/actualizarPersonaje", methods=['GET', 'POST'])
+def actualizarPersonaje():
+    if request.method == "POST":
+        id_personaje = request.form["id"]
+        nombre_personaje = request.form["nombrepj"]
+        nivel_personaje = request.form["nivel"]
+        estado_personaje = request.form["estado"]
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute(f"UPDATE personajes SET Nombre_Personaje = '{nombre_personaje}', Nivel = '{nivel_personaje}', Estado = '{estado_personaje}' WHERE Id_Personaje = '{id_personaje}'")
+        mysql.connection.commit()
+        habilidades_seleccionadas = []
+        for i in range(1, 9):
+            habilidad = request.form.get("habilidad" + str(i))
+            if habilidad:
+                habilidades_seleccionadas.append(int(habilidad))
 
+        cursor.execute("SELECT ID_Habilidad FROM personaje_habilidades WHERE ID_Personaje = %s", (id_personaje,))
+        habilidades_existentes = cursor.fetchall()
+        habilidades_existentes = [habilidad[0] for habilidad in habilidades_existentes]
+
+        habilidades_a_eliminar = list(set(habilidades_existentes) | set(habilidades_seleccionadas))
+        habilidades_a_insertar = list(set(habilidades_existentes) | set(habilidades_seleccionadas))
+
+        if len(habilidades_a_eliminar) > 2:
+            placeholders = ', '.join(['%s'] * len(habilidades_a_eliminar))
+            query_eliminar = f"DELETE FROM personaje_habilidades WHERE ID_Personaje = %s AND ID_Habilidad IN ({placeholders})"
+            params_eliminar = (id_personaje,) + tuple(habilidades_a_eliminar)
+            cursor.execute(query_eliminar, params_eliminar)
+            conn.commit()
+
+        for id_habilidad in habilidades_a_insertar:
+            cursor.execute("INSERT INTO personaje_habilidades (ID_Personaje, ID_Habilidad) VALUES (%s, %s)",
+                        (id_personaje, id_habilidad))
+            conn.commit()
+    #PODERES
+        poderes_seleccionados = []
+        for i in range(2, 5):
+            poder = request.form.get("poder" + str(i))
+            if poder:
+                poderes_seleccionados.append(int(poder))
+        
+        cursor.execute("SELECT ID_Poder FROM personaje_poderes WHERE ID_Personaje = %s", (id_personaje,))
+        poderes_existentes = cursor.fetchall()
+        poderes_existentes = [poder[0] for poder in poderes_existentes]
+        
+        poderes_a_eliminar = list(set(poderes_existentes) | set(poderes_seleccionados))
+        poderes_a_insertar = list(set(poderes_existentes) | set(poderes_seleccionados))
+
+        if len(poderes_a_eliminar) > 1:
+            placeholders = ', '.join(['%s'] * len(poderes_a_eliminar))
+            query_eliminar = f"DELETE FROM personaje_poderes WHERE ID_Personaje = %s AND ID_Poder IN ({placeholders})"
+            params_eliminar = (id_personaje,) + tuple(poderes_a_eliminar)
+            cursor.execute(query_eliminar, params_eliminar)
+            conn.commit()
+
+        for id_poder in poderes_a_insertar:
+            cursor.execute("INSERT INTO personaje_poderes (ID_Personaje, ID_Poder) VALUES (%s, %s)",
+                (id_personaje, id_poder))
+            conn.commit()
+        #EQUIPAMIENTOS
+        
+
+        equipamiento2 = request.form["equipamiento2"]
+        equipamiento3 = request.form["equipamiento3"]
+        equipamiento4 = request.form["equipamiento4"]
+        equipamiento5 = request.form["equipamiento5"]
+        equipamiento6 = request.form["equipamiento6"]
+        equipamiento7 = request.form["equipamiento7"]
+        equipamiento8 = request.form["equipamiento8"]
+        cantidad2 = request.form["cantidad2"]
+        cantidad3 = request.form["cantidad3"]
+        cantidad4 = request.form["cantidad4"]
+        cantidad5 = request.form["cantidad5"]
+        cantidad6 = request.form["cantidad6"]
+        cantidad7 = request.form["cantidad7"]
+        cantidad8 = request.form["cantidad8"]
+        cursor.close()
+        return redirect(url_for("paginaGM"))
+    else:
+        return("Datos invalidos")
+
+@app.context_processor
+def utility_processor():
+    def razas():
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM razas")
+        razas = cursor.fetchall()
+        cursor.close()
+        return razas
+    return dict(razas=razas)
+    
 
 @app.context_processor
 def utility_processor():
@@ -217,33 +319,6 @@ def utility_processor():
         return equipamientos
 
     return dict(obtenerEquipamientos=obtenerEquipamientos)
-
-def obtenerDetallesPersonaje(id_personaje):
-    conn = mysql.connection
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM personajes WHERE ID_Personaje = %s", (id_personaje,))
-    personaje = list(cursor.fetchone())
-    cursor.execute("SELECT Nombre_Poder FROM poderes p INNER JOIN personaje_poderes pp ON p.ID_Poder = pp.ID_Poder WHERE pp.ID_Personaje = %s", (id_personaje,))
-    poderes = cursor.fetchall()
-    poderes_list = [p[0] for p in poderes]
-    cursor.execute("SELECT Nombre_Poder FROM poderes")
-    poderesT = cursor.fetchall()
-    cursor.close()
-    personaje.append(poderes_list)
-    personaje.append(poderesT)
-    return personaje
-
-@app.route('/personaje/<int:id>', methods=['GET'])
-def obtener_detalles_personaje(id):
-    personaje = obtenerDetallesPersonaje(id)
-    if personaje:
-        return jsonify(personaje), 200
-    else:
-        return jsonify({'error': 'Personaje no encontrado'}), 404
-
-@app.context_processor
-def utility_processor():
-    return dict(obtenerDetallesPersonaje=obtenerDetallesPersonaje)
 
 @app.route("/informe")
 def generarInforme():

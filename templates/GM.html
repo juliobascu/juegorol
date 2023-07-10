@@ -121,8 +121,12 @@
                             <input type="text" class="form-control" id="nombreHabilidad" name="nombreHabilidad" required>
                         </div>
                         <div class="mb-3">
-                            <label for="razaHabilidad" class="form-label">Raza a la cual pertenece:</label>
-                            <input type="text" class="form-control" id="razaHabilidad" name="razaHabilidad" required>
+                            <label for="razaHabilidad" class="form-label">Raza a la cual Pertenece:</label>
+                            <select class="form-select" id="razaHabilidad" name="razaHabilidad">
+                                {% for raza in razas %}
+                                    <option value="{{ raza[0] }}">{{ raza[0] }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Agregar Habilidad Al Sistema</button>
                     </form>
@@ -149,8 +153,12 @@
                             <textarea class="form-control" id="detallePoder" name="detallePoder" rows="3" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="razaPoder" class="form-label">Raza a la cual pertenece:</label>
-                            <input type="text" class="form-control" id="razaPoder" name="razaPoder" required>
+                            <label for="razaPoder" class="form-label">Raza a la cual Pertenece:</label>
+                            <select class="form-select" id="razaPoder" name="razaPoder">
+                                {% for raza in razas %}
+                                    <option value="{{ raza[0] }}">{{ raza[0] }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Agregar Poder Al Sistema</button>
                     </form>

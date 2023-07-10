@@ -10,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/GM.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/editorPj.js') }}"></script>
+
 </head>
 <body>
     <header>
@@ -23,88 +25,322 @@
           </div>
     </header>
     <main>
-        <div class="container-fluid p-4">
-            <form id="editarPersonajeForm">
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombre:</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ personaje[3] }}" required>
-                </div>
-                <div class="mb-3">
-                    <label for="raza" class="form-label">Raza:</label>
-                    <select class="form-select" id="razas" name="razas">
-                        <option value="{{ personaje[4] }}" selected>{{ personaje[4] }}</option>
-                        {% for raza in razas %}
-                            {% if raza[0] != personaje[4] %}
-                                <option value="{{ raza[0] }}">{{ raza[0] }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-                <!-- Otros campos del formulario para editar los detalles del personaje -->
-            
-                <div class="row">
-                    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <div class="container-fluid p-5">
+                    <form id="editarPersonajeForm" action="{{ url_for('actualizarPersonaje') }}" method="POST">
+                        <div class="row">
+                            <div class="mb-3 col-6">
+                                <label for="id" class="form-label">ID:</label>
+                                <input type="text" class="form-control" id="id" name="id" value="{{ personaje[0] }}" readonly>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="nombrepj" class="form-label">Nombre Personaje:</label>
+                                <input type="text" class="form-control" id="nombrepj" name="nombrepj" value="{{ personaje[3] }}" required >
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="mb-3 col-6">
+                                <label for="nivel" class="form-label">Nivel:</label>
+                                <input type="number" class="form-control" id="nivel" name="nivel" value="{{ personaje[5] }}" min="{{ personaje[5] }}" required>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="estado" class="form-label">Estado:</label>
+                                <select class="form-select" id="estado" name="estado">
+                                    <option value="{{ estados[0][0] }}" selected>{{ estados[0][0] }}</option>
+                                    {% for estado in estadosTotal %}
+                                        {% if estado[0] != estados[0][0] %}
+                                            <option value="{{ estado[0] }}">{{ estado[0] }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                         <div class="mb-3">
-                            <label for="poder" class="form-label">Poder 1:</label>
-                            <select class="form-select" id="poder" name="poder" >
-                                <option selected>{{ poderes[0][0] }}</option>
-                                {% for poder in poderes[1:] %}
-                                    {% if poder[0] not in poderes %}
-                                        <option value="{{ poder[0] }}">{{ poder[0] }}</option>
+                            <label for="raza" class="form-label">Raza:</label>
+                            <select class="form-select" id="raza" name="raza" disabled>
+                                <option value="{{ personaje[4] }}" selected>{{ personaje[4] }}</option>
+                                {% for raza in razas %}
+                                    {% if raza[0] != personaje[4] %}
+                                        <option value="{{ raza[0] }}">{{ raza[0] }}</option>
                                     {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="mb-3">
-                            <label for="poder2" class="form-label">Poder 2:</label>
-                            <select class="form-select" id="poder2" name="poder2">
-                                <option selected>{{ poderes[1][0] }}</option>
-                                {% for poder in poderes[1:] %}
-                                    {% if poder[1] not in poderes %}
-                                        <option value="{{ poder[0] }}">{{ poder[0] }}</option>
+                        
+                        <!-- HABILIDADES -->
+                        <div class="row">
+                            <div class="mb-3 col-6">
+                                <label for="habilidad1" class="form-label">Habilidad 1:</label>
+                                <select name="habilidad1" id="habilidad1" class="form-select" disabled>
+                                    <option value="{{ habilidades[0][0] }}" selected>{{ habilidades[0][1]}}</option>
+                                </select>
+                            </div>    
+                            <div class="mb-3 col-6">
+                                <label for="habilidad2" class="form-label">Habilidad 2:</label>
+                                <select name="habilidad2" id="habilidad2" class="form-select" disabled>
+                                    <option value="{{ habilidades[1][0] }}" selected>{{ habilidades[1][1]}}</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="habilidad3" class="form-label">Habilidad 3:</label>
+                                <select class="form-select" id="habilidad3" name="habilidad3">
+                                    {% if habilidades|length < 3 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{ habilidades[2][0] }}">{{ habilidades[2][1] }}</option>
                                     {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="mb-3">
-                            <label for="poderes3" class="form-label">Poderes 3:</label>
-                            <select class="form-select" id="habilidades3" name="habilidades3">
-                                <option selected disabled>{{ poderes[2][0] }}</option>
-                                {% for poder in poderes[1:] %}
-                                    {% if poder[2] not in poderes_asignados %}
-                                        <option value="{{ poder[0] }}">{{ poder[0] }}</option>
+                                    {% set habilidad_repetida = false %}
+                                    {% for habilidadRaza in habilidadesRaza %}
+                                        {% set habilidad_encontrada = false %}
+                                        {% for habilidad in habilidades %}
+                                            {% if habilidadRaza[1] == habilidad[0][1] %}
+                                                {% set habilidad_encontrada = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not habilidad_encontrada and not habilidad_repetidad %}
+                                            <option value="{{ habilidadRaza[0] }}">{{ habilidadRaza[1] }}</option>
+                                            {% set habilidad_repetidad = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" name="idHabilidades" value="{{ habilidadesRaza }}">
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="habilidad4" class="form-label">Habilidad 4:</label>
+                                <select class="form-select" id="habilidad4" name="habilidad4">
+                                    {% if habilidades|length < 4 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{ habilidades[3][0] }}">{{ habilidades[3][1] }}</option>
                                     {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="mb-3">
-                            <label for="poderes4" class="form-label">Poderes 4:</label>
-                            <select class="form-select" id="habilidades4" name="habilidades4">
-                                <option selected disabled>{{ poderes[0][0] }}</option>
-                                {% for poder in poderes[1:] %}
-                                    {% if poder[3] not in poderes_asignados %}
-                                        <option value="{{ poder[0] }}">{{ poder[0] }}</option>
+                                    {% set habilidad_repetida = false %}
+                                    {% for habilidadRaza in habilidadesRaza %}
+                                        {% set habilidad_encontrada = false %}
+                                        {% for habilidad in habilidades %}
+                                            {% if habilidadRaza[1] == habilidad[0][1] %}
+                                                {% set habilidad_encontrada = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not habilidad_encontrada and not habilidad_repetidad %}
+                                            <option value="{{ habilidadRaza[0] }}">{{ habilidadRaza[1] }}</option>
+                                            {% set habilidad_repetidad = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="habilidad5" class="form-label">Habilidad 5:</label>
+                                <select class="form-select" id="habilidad5" name="habilidad5">
+                                    {% if habilidades|length < 5 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{habilidades[4][0]}}">{{ habilidades[4][1] }}</option>
                                     {% endif %}
-                                {% endfor %}
-                            </select>
+                                    {% set habilidad_repetida = false %}
+                                    {% for habilidadRaza in habilidadesRaza %}
+                                        {% set habilidad_encontrada = false %}
+                                        {% for habilidad in habilidades %}
+                                            {% if habilidadRaza[1] == habilidad[0][1] %}
+                                                {% set habilidad_encontrada = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not habilidad_encontrada and not habilidad_repetidad %}
+                                            <option value="{{ habilidadRaza[0] }}">{{ habilidadRaza[1] }}</option>
+                                            {% set habilidad_repetidad = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="habilidad6" class="form-label">Habilidad 6:</label>
+                                <select class="form-select" id="habilidad6" name="habilidad6">
+                                    {% if habilidades|length < 6 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{ habilidades[5][0] }}">{{ habilidades[5][1] }}</option>
+                                    {% endif %}
+                                    {% set habilidad_repetida = false %}
+                                    {% for habilidadRaza in habilidadesRaza %}
+                                        {% set habilidad_encontrada = false %}
+                                        {% for habilidad in habilidades %}
+                                            {% if habilidadRaza[1] == habilidad[0][1] %}
+                                                {% set habilidad_encontrada = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not habilidad_encontrada and not habilidad_repetidad %}
+                                            <option value="{{ habilidadRaza[0] }}">{{ habilidadRaza[1] }}</option>
+                                            {% set habilidad_repetidad = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="habilidad7" class="form-label">Habilidad 7:</label>
+                                <select class="form-select" id="habilidad3" name="habilidad7">
+                                    {% if habilidades|length < 7 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{ habilidades[6][0] }}">{{ habilidades[6][1] }}</option>
+                                    {% endif %}
+                                    {% set habilidad_repetida = false %}
+                                    {% for habilidadRaza in habilidadesRaza %}
+                                        {% set habilidad_encontrada = false %}
+                                        {% for habilidad in habilidades %}
+                                            {% if habilidadRaza[1] == habilidad[0][1] %}
+                                                {% set habilidad_encontrada = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not habilidad_encontrada and not habilidad_repetidad %}
+                                            <option value="{{ habilidadRaza[0] }}">{{ habilidadRaza[1] }}</option>
+                                            {% set habilidad_repetidad = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="habilidad8" class="form-label">Habilidad 8:</label>
+                                <select class="form-select" id="habilidad8" name="habilidad8">
+                                    {% if habilidades|length < 8 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{ habilidades[7][0] }}">{{ habilidades[7][1] }}</option>
+                                    {% endif %}
+                                    {% set habilidad_repetida = false %}
+                                    {% for habilidadRaza in habilidadesRaza %}
+                                        {% set habilidad_encontrada = false %}
+                                        {% for habilidad in habilidades %}
+                                            {% if habilidadRaza[1] == habilidad[0][1] %}
+                                                {% set habilidad_encontrada = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not habilidad_encontrada and not habilidad_repetidad %}
+                                            <option value="{{ habilidadRaza[0] }}">{{ habilidadRaza[1] }}</option>
+                                            {% set habilidad_repetidad = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Otros campos del formulario para editar las habilidades, poderes y equipamientos -->
-            
-                <button type="submit" class="btn btn-primary">Guardar cambios</button>
-            </form>
+                        <!-- PODERES -->
+                        <div class="row">
+                            <div class="mb-3 col-6">
+                                <label for="poder1" class="form-label">Poder 1:</label>
+                                <select class="form-select" id="poder1" name="poder1" disabled>
+                                    <option value="{{ poderes[0][0] }}" selected>{{ poderes[0][1] }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="poder2" class="form-label">Poder 2:</label>
+                                <select class="form-select" id="poder2" name="poder2">
+                                    {% if poderes|length < 2 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{ poderes[1][0] }}">{{ poderes[1][1] }}</option>
+                                    {% endif %}
+                                    {% set poder_repetido = false %}
+                                    {% for poderRaza in poderesRaza %}
+                                        {% set poder_encontrado = false %}
+                                        {% for poder in poderes %}
+                                            {% if poderRaza[1] == poder[0][1] %}
+                                                {% set poder_encontrado = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not poder_encontrado and not poder_repetido %}
+                                            <option value="{{ poderRaza[0] }}">{{ poderRaza[1] }}</option>
+                                            {% set poder_repetido = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="poder3" class="form-label">Poder 3:</label>
+                                <select class="form-select" id="poder3" name="poder3">
+                                    {% if poderes|length < 3 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{ poderes[2][0] }}">{{ poderes[2][1] }}</option>
+                                    {% endif %}
+                                    {% set poder_repetido = false %}
+                                    {% for poderRaza in poderesRaza %}
+                                        {% set poder_encontrado = false %}
+                                        {% for poder in poderes %}
+                                            {% if poderRaza[1] == poder[0][1] %}
+                                                {% set poder_encontrado = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not poder_encontrado and not poder_repetido %}
+                                            <option value="{{ poderRaza[0] }}">{{ poderRaza[1] }}</option>
+                                            {% set poder_repetido = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="poder4" class="form-label">Poder 4:</label>
+                                <select class="form-select" id="poder4" name="poder4">
+                                    {% if poderes|length < 4 %}
+                                        <option value="" selected></option>
+                                    {% else %}
+                                        <option value="{{ poderes[3][0] }}">{{ poderes[3][1] }}</option>
+                                    {% endif %}
+                                    {% set poder_repetido = false %}
+                                    {% for poderRaza in poderesRaza %}
+                                        {% set poder_encontrado = false %}
+                                        {% for poder in poderes %}
+                                            {% if poderRaza[1] == poder[0][1] %}
+                                                {% set poder_encontrado = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not poder_encontrado and not poder_repetido %}
+                                            <option value="{{ poderRaza[0] }}">{{ poderRaza[1] }}</option>
+                                            {% set poder_repetido = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- EQUIPAMIENTOS -->
+                        <div class="row">
+                            <div class="mb-3 col-6">
+                                <label for="equipamiento1" class="form-label">Equipamiento 1:</label>
+                                <div class="input-group">
+                                    <select class="form-select" id="equipamiento1" name="equipamiento1" disabled>
+                                        <option value="{{ equipamientos[0][0] }}" selected>{{ equipamientos[0][0] }}</option>
+                                    </select>
+                                    <input type="number" class="form-control" id="cantidad1" name="cantidad1" value="{{ equipamientos[0][1] }}" disabled>
+                                </div>
+                            </div>
+                            {% for i in range(2, 9) %}
+                                <div class="mb-3 col-6">
+                                    <label for="equipamiento{{ i }}" class="form-label">Equipamiento {{ i }}:</label>
+                                    <div class="input-group">
+                                        <select class="form-select" id="equipamiento{{ i }}" name="equipamiento{{ i }}">
+                                            {% if equipamientos|length < i %}
+                                                <option value="" selected></option>
+                                            {% else %}
+                                                <option value="{{equipamientos[i-1][0]}}">{{ equipamientos[i-1][0] }}</option>
+                                            {% endif %}
+                                            {% for equipamiento in equipamientosTotal %}
+                                                <option value="{{ equipamiento[0] }}">{{ equipamiento[0] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <input type="number" class="form-control" id="cantidad{{ i }}" name="cantidad{{ i }}" value="{% if equipamientos|length >= i %}{{ equipamientos[i-1][1] }}{% endif %}">
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">Guardar cambios</button>
+                        <button type="submit" class="btn btn-danger">Eliminar Personaje</button>
+                        <button type="reset" class="btn btn-secondary">Reiniciar</button>
+                    </form>
+                </div>   
+            </div>
         </div>
     </main>
+    
     <footer>
         <div class="footer">
             <p>&copy; Infinity Creations</p>
