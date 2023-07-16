@@ -32,7 +32,22 @@
     </header>
     <div class="contaier p-4">
         <main>
-            <h3>Jugadores:</h3>
+            <div class="row justify-content-between">
+                <div class="col-6">
+                    <h3>Jugadores:</h3>
+                </div>
+                {% with messages = get_flashed_messages() %}
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible fade show col-6" role="alert">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+            </div>
             {% if nusuarios == 0 %}
                 <div class="container p-4">
                     <div class="card" style="width: 18rem;">
@@ -48,7 +63,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Usuario</th>
+                        <th>Jugador</th>
                         <th>Personajes</th>
                     </tr>
                 </thead>
@@ -79,6 +94,9 @@
                 </tbody>
             </table>
             {% endif %}
+            <div class="botonAgregar w-100 text-center">
+                <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#agregarUsuario">Agregar Usuario</a>
+            </div>
         </main>
     </div>
     <footer>
@@ -86,13 +104,45 @@
             <p>&copy; Infinity Creations</p>
         </div>
     </footer>
-
+    <!-- MODAL AGREGAR USUARIOS -->
+    <div class="modal fade" id="agregarUsuario" tabindex="-1" aria-labelledby="agregarUsuario" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarHabilidadLabel">Agregar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="agregarUsuarioForm" method="POST" action="{{ url_for('agregar_usuario') }}">
+                        <div class="mb-3">
+                            <label for="nombreUsuario" class="form-label">Nombre de Usuario:</label>
+                            <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contraUsuario" class="form-label">Contraseña:</label>
+                            <input type="text" class="form-control" id="contraUsuario" name="contraUsuario" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rolUsuario" class="form-label">Rol:</label>
+                            <select class="form-select" id="rolUsuario" name="rolUsuario" required>
+                                <option value=""></option>
+                                <option value="0">Jugador</option>
+                                <option value="1">Game Master (GM)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Usuario Al Sistema</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- MODAL BUSQUEDA PERSONAJE -->
     <div class="modal fade" id="editorpj" tabindex="-1" aria-labelledby="editorpj" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Ingrese el Id del Personaje que quiere editar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="{{ url_for('buscar_personaje') }}">

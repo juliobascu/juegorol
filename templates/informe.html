@@ -14,19 +14,25 @@
 </head>
 <body>
     <header>
-        <div id="nombreGM" class="">
-          <div class="">
+        <div id="nombreGM" class="row">
+          <div class="col-3 text-center ms-3">
               Informe
           </div>
         </div>
-        <div id="botones" class="btn-group botones col-6">
-          <a href="{{url_for('paginaGM')}}" class="btn btn-light boton">Volver</a>
+        <div id="botones" class="col-4 btn-group me-3">
+          <a href="{{url_for('paginaGM')}}" class="btn btn-light boton w-100 h-100">Salir</a>
         </div>
     </header>
     <main>
         <div class="container">
-            <h1 class="mt-4 mb-4">Lista de personajes</h1>
-            <button class="btn btn-success mb-3" onclick="imprimir()">Imprimir</button>
+            <div class="d-flex justify-content-between">
+              <div>
+                <h1 class="mt-4 mb-4">Lista de personajes</h1>
+              </div>
+              <div>
+                <button class="btn btn-success m-4" onclick="imprimir()">Imprimir</button>
+              </div>
+            </div>
             <table class="table table-striped mb-3">
               <thead>
                 <tr>

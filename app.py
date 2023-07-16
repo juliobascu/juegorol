@@ -126,6 +126,7 @@ def actualizarPersonaje():
         cursor = conn.cursor()
         cursor.execute(f"UPDATE personajes SET Nombre_Personaje = '{nombre_personaje}', Nivel = '{nivel_personaje}', Estado = '{estado_personaje}' WHERE Id_Personaje = '{id_personaje}'")
         mysql.connection.commit()
+    #Habilidades
         habilidades_seleccionadas = []
         for i in range(1, 9):
             habilidad = request.form.get("habilidad" + str(i))
@@ -204,22 +205,11 @@ def actualizarPersonaje():
         for equipamiento, cantidad in zip(equipamientos_a_insertar, cantidades):
             cursor.execute("INSERT INTO personaje_equipamientos (ID_Personaje, ID_Equipamiento, cantidad) VALUES (%s, %s, %s)",(id_personaje, equipamiento, cantidad))
             conn.commit()
+        flash("Personaje Actualizado")
         cursor.close()
         return redirect(url_for("paginaGM"))
     else:
-        return("Datos invalidos")
-
-@app.context_processor
-def utility_processor():
-    def razas():
-        conn = mysql.connection
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM razas")
-        razas = cursor.fetchall()
-        cursor.close()
-        return razas
-    return dict(razas=razas)
-    
+        return redirect(url_for("actualizarPersonaje"))    
 
 @app.context_processor
 def utility_processor():
@@ -254,8 +244,21 @@ def actualizarPoderes():
     cursor.execute(f"SELECT ID_Poder, Nombre_Poder FROM poderes WHERE Raza = '{data['raza']}'")
     poderes = cursor.fetchall()
     cursor.close()
-    print(poderes)
     return {'poderes': poderes}
+
+@app.route('/agregar_usuario', methods=['POST'])
+def agregar_usuario():
+    if request.method == "POST":
+        nombre_usuario = request.form['nombreUsuario']
+        contraseña = request.form['contraUsuario']
+        es_gm = request.form['rolUsuario']
+        conn = mysql.connection
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO usuarios (Nombre_Usuario, Contraseña, Es_GM) VALUES (%s, %s, %s)", (nombre_usuario, contraseña, es_gm))
+        mysql.connection.commit()
+        flash("Usuario Agergado")
+        cursor.close()
+        return redirect(url_for("paginaGM"))
 
 @app.route('/agregar_poder', methods=['POST'])
 def agregar_poder():
@@ -267,6 +270,8 @@ def agregar_poder():
         cursor = conn.cursor()
         cursor.execute("INSERT INTO poderes (Nombre_Poder, Detalle, Raza) VALUES (%s, %s, %s)", (nombre_poder, detalle_poder, raza_poder))
         mysql.connection.commit()
+        flash("Poder Agergado")
+        cursor.close()
         return redirect(url_for("paginaGM"))
     
 @app.route('/agregar_habilidad', methods=['POST'])
@@ -278,6 +283,8 @@ def agregar_habilidad():
         cursor = conn.cursor()
         cursor.execute("INSERT INTO habilidades (Nombre_Habilidad, Condicional_Raza) VALUES (%s, %s)", (nombre_habilidad, raza_habilidad))
         mysql.connection.commit()
+        flash("Habilidad Agergada")
+        cursor.close()
         return redirect(url_for("paginaGM"))
 
 @app.route('/agregar_raza', methods=['POST'])
@@ -288,6 +295,8 @@ def agregar_raza():
         cursor = conn.cursor()
         cursor.execute("INSERT INTO poderes (Raza) VALUES (%s)", (nombre_raza,))
         mysql.connection.commit()
+        flash("Raza Agergada")
+        cursor.close()
         return redirect(url_for("paginaGM"))
 
 @app.route('/agregar_equipamiento', methods=['POST'])
@@ -298,6 +307,8 @@ def agregar_equipamiento():
         cursor = conn.cursor()
         cursor.execute("INSERT INTO equipamientos (Nombre_Equipamiento) VALUES (%s)", (nombre_equipamiento,))
         mysql.connection.commit()
+        flash("Equipamiento Agergado")
+        cursor.close()
         return redirect(url_for("paginaGM"))
     
 @app.route('/agregar_estado', methods=['POST'])
@@ -308,6 +319,8 @@ def agregar_estado():
         cursor = conn.cursor()
         cursor.execute("INSERT INTO estados (Nombre_Estado) VALUES (%s)", (nombre_estado,))
         mysql.connection.commit()
+        flash("Estado Agergado")
+        cursor.close()
         return redirect(url_for("paginaGM"))
     
     
