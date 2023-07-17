@@ -256,7 +256,7 @@ def agregar_usuario():
         cursor = conn.cursor()
         cursor.execute("INSERT INTO usuarios (Nombre_Usuario, Contraseña, Es_GM) VALUES (%s, %s, %s)", (nombre_usuario, contraseña, es_gm))
         mysql.connection.commit()
-        flash("Usuario Agergado")
+        flash("Usuario Creado")
         cursor.close()
         return redirect(url_for("paginaGM"))
 
